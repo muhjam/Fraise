@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.env.production
+.env.local
+.env
+.DS_Store
+README.md
+documentation.md
+plans
+Dockerfile
+.dockerignore
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.prettierrc
