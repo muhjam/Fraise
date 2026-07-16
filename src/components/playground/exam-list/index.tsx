@@ -21,6 +21,8 @@ import {
     Mail01,
     Send01,
     LogOut01,
+    ChevronDown,
+    ChevronUp,
 } from "@untitledui/icons";
 
 // ─── Invite Modal ──────────────────────────────────────────────────────────────
@@ -333,6 +335,7 @@ export const PlaygroundExamList = () => {
     const [filterSource, setFilterSource] = useState<FilterSource>("all");
     const [filterSkills, setFilterSkills] = useState<SkillType[]>([]);
     const [inviteExamId, setInviteExamId] = useState<string | null>(null);
+    const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
 
     const toggleSkill = (skill: SkillType) => {
         setFilterSkills((prev) =>
@@ -419,71 +422,91 @@ export const PlaygroundExamList = () => {
             {/* Filters */}
             <div className="flex flex-col gap-2.5">
                 {/* Source filter */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                    <FilterLines className="size-3.5 text-tertiary shrink-0" />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mr-0.5 w-[50px]">Sumber</span>
-                    {SOURCE_FILTERS.map((s) => (
-                        <button
-                            key={s.key}
-                            onClick={() => setFilterSource(s.key)}
-                            className={cx(
-                                "rounded-full px-3 py-1 text-xs font-semibold transition-colors border",
-                                filterSource === s.key
-                                    ? "bg-brand-600 text-white border-brand-600"
-                                    : "bg-primary text-secondary border-secondary hover:border-brand-400 hover:text-brand-700"
-                            )}
-                        >
-                            {s.label}
-                        </button>
-                    ))}
+                <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        <FilterLines className="size-3.5 text-tertiary shrink-0" />
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mr-0.5 w-[50px]">Sumber</span>
+                        {SOURCE_FILTERS.map((s) => (
+                            <button
+                                key={s.key}
+                                onClick={() => setFilterSource(s.key)}
+                                className={cx(
+                                    "rounded-full px-3 py-1 text-xs font-semibold transition-colors border",
+                                    filterSource === s.key
+                                        ? "bg-brand-600 text-white border-brand-600"
+                                        : "bg-primary text-secondary border-secondary hover:border-brand-400 hover:text-brand-700"
+                                )}
+                            >
+                                {s.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+                        className="hidden md:flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 py-1.5 px-3 rounded-lg border border-secondary hover:border-brand-300 bg-primary/50 transition-all hover:bg-secondary cursor-pointer shrink-0"
+                    >
+                        <span>Filter Lainnya</span>
+                        {isFiltersExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                    </button>
                 </div>
 
-                {/* Status filter */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="size-3.5 shrink-0" />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mr-0.5 w-[50px]">Status</span>
-                    {STATUS_FILTERS.map((f) => (
-                        <button
-                            key={f.key}
-                            onClick={() => setFilterStatus(f.key)}
-                            className={cx(
-                                "rounded-full px-3 py-1 text-xs font-semibold transition-colors border",
-                                filterStatus === f.key
-                                    ? "bg-brand-600 text-white border-brand-600"
-                                    : "bg-primary text-secondary border-secondary hover:border-brand-400 hover:text-brand-700"
-                            )}
-                        >
-                            {f.label}
-                        </button>
-                    ))}
-                </div>
+                {/* Collapsible filters container */}
+                <div className={cx(
+                    "grid transition-all duration-300 ease-in-out",
+                    isFiltersExpanded
+                        ? "grid-rows-[1fr] opacity-100 mt-2.5 md:mt-0.5"
+                        : "grid-rows-[1fr] opacity-100 md:grid-rows-[0fr] md:opacity-0 md:overflow-hidden mt-2.5 md:mt-0"
+                )}>
+                    <div className="min-h-0 flex flex-col gap-2.5">
+                        {/* Status filter */}
+                        <div className="flex items-center gap-1.5 flex-wrap py-0.5">
+                            <span className="size-3.5 shrink-0" />
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mr-0.5 w-[50px]">Status</span>
+                            {STATUS_FILTERS.map((f) => (
+                                <button
+                                    key={f.key}
+                                    onClick={() => setFilterStatus(f.key)}
+                                    className={cx(
+                                        "rounded-full px-3 py-1 text-xs font-semibold transition-colors border",
+                                        filterStatus === f.key
+                                            ? "bg-brand-600 text-white border-brand-600"
+                                            : "bg-primary text-secondary border-secondary hover:border-brand-400 hover:text-brand-700"
+                                    )}
+                                >
+                                    {f.label}
+                                </button>
+                            ))}
+                        </div>
 
-                {/* Skill filter (multi-select) */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="size-3.5 shrink-0" />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mr-0.5 w-[50px]">Skill</span>
-                    {ALL_SKILLS.map((skill) => (
-                        <button
-                            key={skill}
-                            onClick={() => toggleSkill(skill)}
-                            className={cx(
-                                "rounded-full px-3 py-1 text-xs font-semibold transition-colors border",
-                                filterSkills.includes(skill)
-                                    ? SKILL_COLORS[skill]?.replace("bg-", "border-") + " " + SKILL_COLORS[skill]
-                                    : "bg-primary text-secondary border-secondary hover:border-brand-400 hover:text-brand-700"
+                        {/* Skill filter (multi-select) */}
+                        <div className="flex items-center gap-1.5 flex-wrap py-0.5">
+                            <span className="size-3.5 shrink-0" />
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mr-0.5 w-[50px]">Skill</span>
+                            {ALL_SKILLS.map((skill) => (
+                                <button
+                                    key={skill}
+                                    onClick={() => toggleSkill(skill)}
+                                    className={cx(
+                                        "rounded-full px-3 py-1 text-xs font-semibold transition-colors border",
+                                        filterSkills.includes(skill)
+                                            ? SKILL_COLORS[skill]?.replace("bg-", "border-") + " " + SKILL_COLORS[skill]
+                                            : "bg-primary text-secondary border-secondary hover:border-brand-400 hover:text-brand-700"
+                                    )}
+                                >
+                                    {skill}
+                                </button>
+                            ))}
+                            {filterSkills.length > 0 && (
+                                <button
+                                    onClick={() => setFilterSkills([])}
+                                    className="text-[10px] text-tertiary hover:text-primary transition-colors underline ml-2 cursor-pointer"
+                                >
+                                    Reset
+                                </button>
                             )}
-                        >
-                            {skill}
-                        </button>
-                    ))}
-                    {filterSkills.length > 0 && (
-                        <button
-                            onClick={() => setFilterSkills([])}
-                            className="text-[10px] text-tertiary hover:text-primary transition-colors underline ml-2"
-                        >
-                            Reset
-                        </button>
-                    )}
+                        </div>
+                    </div>
                 </div>
             </div>
 

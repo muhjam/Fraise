@@ -353,6 +353,12 @@ export const AudioPlayer = ({ text, language = "English", onEnd }: AudioPlayerPr
                     />
                 </div>
             </div>
+
+            {/* Helper Text */}
+            <div className="text-[11px] text-brand-600/80 dark:text-brand-300/60 font-medium leading-normal flex items-start gap-1">
+                <span>*</span>
+                <span>Catatan: Karakter suara terdengar serupa. Perhatikan label pembantu seperti NARRATOR, MALE, atau FEMALE pada naskah soal.</span>
+            </div>
         </div>
     );
 };

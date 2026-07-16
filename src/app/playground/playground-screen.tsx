@@ -500,12 +500,13 @@ export const PlaygroundScreen = () => {
                                     Batal
                                 </Button>
                                 <Button
+                                    color="primary-destructive"
                                     size="lg"
                                     onClick={() => {
                                         setIsExitModalOpen(false);
                                         handleExit();
                                     }}
-                                    className="flex-1 bg-error-600 border-error-600 hover:bg-error-700 text-white font-semibold transition-colors justify-center"
+                                    className="flex-1 font-semibold"
                                 >
                                     Ya, Keluar
                                 </Button>
