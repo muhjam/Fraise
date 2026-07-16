@@ -52,6 +52,7 @@ interface ExamState {
     goToQuestion: (index: number) => void;
     finishExam: () => void;
     retryActiveExam: () => void;
+    startExam: () => void;
 }
 
 export const useExamStore = create<ExamState>()(
@@ -95,7 +96,7 @@ export const useExamStore = create<ExamState>()(
                 set((state) => ({
                     exams: state.exams.map((e) =>
                         e.id === state.activeExamId
-                            ? { ...e, questions, status: "ongoing", startTime: Date.now() }
+                            ? { ...e, questions, status: "ongoing", startTime: null }
                             : e
                     ),
                 })),
@@ -160,6 +161,15 @@ export const useExamStore = create<ExamState>()(
                                 startTime: Date.now(),
                                 endTime: null,
                             }
+                            : e
+                    ),
+                })),
+
+            startExam: () =>
+                set((state) => ({
+                    exams: state.exams.map((e) =>
+                        e.id === state.activeExamId
+                            ? { ...e, startTime: Date.now(), status: "ongoing" }
                             : e
                     ),
                 })),

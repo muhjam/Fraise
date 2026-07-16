@@ -272,7 +272,7 @@ export const ResultScreen = () => {
                                                     {(isMC || isWriting || q.skill.toLowerCase() === "speaking") && (
                                                         <div className={cx(
                                                             "flex items-center gap-1.5 text-sm font-medium",
-                                                            isCorrect ? "text-success-700" : "text-error-700"
+                                                            isCorrect ? "text-success-primary" : "text-error-primary"
                                                         )}>
                                                             {isCorrect ? <CheckCircle className="size-4" /> : <XCircle className="size-4" />}
                                                             {isCorrect ? "Benar" : "Salah"}
@@ -288,7 +288,7 @@ export const ResultScreen = () => {
                                                     <div className={cx(
                                                         "rounded-lg border p-3 text-sm",
                                                         (isMC || isWriting)
-                                                            ? (isCorrect ? "border-success-200 bg-success-50 text-success-700" : "border-error-200 bg-error-50 text-error-700")
+                                                            ? (isCorrect ? "border-success-200 bg-success-50 text-success-primary" : "border-error-200 bg-error-50 text-error-primary")
                                                             : "border-secondary bg-secondary text-primary"
                                                     )}>
                                                         {userAnsDisplay ? (

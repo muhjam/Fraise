@@ -44,6 +44,7 @@ export const PlaygroundScreen = () => {
         deleteExam,
         exams,
         hasHydrated,
+        startExam,
     } = useExamStore();
 
     const [generatingProgress, setGeneratingProgress] = useState(0);
@@ -223,6 +224,86 @@ export const PlaygroundScreen = () => {
             router.push("/");
         }
     };
+
+    const SKILL_COLORS: Record<string, string> = {
+        Reading: "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300",
+        Writing: "bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300",
+        Speaking: "bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-300",
+        Listening: "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-300",
+    };
+
+    if (activeExam.startTime === null) {
+        return (
+            <div className="flex min-h-dvh flex-col bg-primary animate-in fade-in duration-300">
+                <header className="sticky top-0 z-30 border-b border-secondary bg-primary px-4 py-3 md:px-8">
+                    <div className="mx-auto flex w-full max-w-container items-center justify-between">
+                        <div className="flex items-center gap-2 md:gap-4">
+                            <button
+                                onClick={handleExit}
+                                className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-secondary transition-colors"
+                            >
+                                <Image src="/logo.png" className="object-contain" alt="GatrAI Logo" width={28} height={28} />
+                            </button>
+                            <hr className="h-4 w-px bg-border-secondary md:h-6" />
+                            <span className="text-xs font-semibold text-primary md:text-sm">
+                                Persiapan Ujian
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                            <ThemeToggle />
+                            {isAuthenticated && (
+                                <div className="hidden md:block">
+                                    <PlaygroundUserDropdown />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </header>
+
+                <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 py-12">
+                    <div className="flex flex-col items-center gap-6 rounded-2xl border border-secondary bg-primary_alt p-8 text-center shadow-md">
+                        <FeaturedIcon icon={Zap} color="brand" theme="light" size="xl" />
+                        <div className="flex flex-col gap-2">
+                            <h2 className="text-display-xs font-semibold text-primary">Siap untuk Memulai Ujian?</h2>
+                            <p className="text-sm text-tertiary">
+                                Silakan periksa kembali konfigurasi ujian Anda sebelum memulai. Timer akan mulai berjalan setelah Anda menekan tombol di bawah.
+                            </p>
+                        </div>
+
+                        <div className="w-full border-t border-b border-secondary py-4 text-left flex flex-col gap-3">
+                            <div className="flex justify-between py-1 text-sm">
+                                <span className="text-tertiary">Bahasa</span>
+                                <span className="font-semibold text-primary">{config.language}</span>
+                            </div>
+                            <div className="flex justify-between py-1.5 text-sm border-t border-secondary">
+                                <span className="text-tertiary">Jumlah Soal</span>
+                                <span className="font-semibold text-primary">{questions.length} Soal</span>
+                            </div>
+                            <div className="flex justify-between py-1.5 text-sm border-t border-secondary">
+                                <span className="text-tertiary">Skill yang Diuji</span>
+                                <div className="flex flex-wrap gap-1 justify-end max-w-[200px]">
+                                    {config.skills.map((skill) => (
+                                        <span key={skill} className={cx("rounded px-2 py-0.5 text-xs font-semibold", SKILL_COLORS[skill] ?? "bg-secondary text-secondary")}>
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex w-full gap-3">
+                            <Button className="flex-1" color="secondary" onClick={handleExit}>
+                                Batal
+                            </Button>
+                            <Button className="flex-1" onClick={startExam}>
+                                Mulai Ujian
+                            </Button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-dvh flex-col bg-primary">

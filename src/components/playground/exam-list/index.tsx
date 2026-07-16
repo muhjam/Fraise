@@ -216,7 +216,8 @@ function ExamCard({ exam, currentEmail, onInvite }: ExamCardProps) {
 
     const statusLabel =
         exam.status === "completed" ? "Selesai"
-            : exam.status === "ongoing" ? "Sedang berlangsung"
+            : exam.status === "ongoing"
+                ? (exam.startTime === null ? "Belum dimulai" : "Sedang berlangsung")
                 : exam.status === "generating" ? "Generating..."
                     : "Belum dimulai";
 
@@ -229,7 +230,9 @@ function ExamCard({ exam, currentEmail, onInvite }: ExamCardProps) {
                     exam.status === "completed"
                         ? "bg-success-50 text-success-700 dark:bg-success-950/30 dark:text-success-300"
                         : exam.status === "ongoing"
-                            ? "bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300"
+                            ? (exam.startTime === null
+                                ? "bg-warning-50 text-warning-700 dark:bg-warning-950/30 dark:text-warning-300"
+                                : "bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300")
                             : "bg-secondary text-secondary"
                 )}>
                     {exam.status === "completed" ? <CheckCircle className="size-3" /> : <Play className="size-3" />}
@@ -299,7 +302,7 @@ function ExamCard({ exam, currentEmail, onInvite }: ExamCardProps) {
                         iconTrailing={ArrowRight}
                         onClick={handleAction}
                     >
-                        {exam.status === "completed" ? "Lihat Hasil" : "Lanjutkan"}
+                        {exam.status === "completed" ? "Lihat Hasil" : (exam.startTime === null ? "Mulai" : "Lanjutkan")}
                     </Button>
                 </div>
             </div>

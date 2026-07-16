@@ -4,10 +4,13 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Check, AlertCircle } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { Form } from "@/components/base/form/form";
 import { Input } from "@/components/base/input/input";
 import { BackgroundPattern } from "@/components/shared-assets/background-patterns";
+import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
+import { AlertFloating } from "@/components/application/alerts/alerts";
 import { useAuthStore } from "@/store/use-auth-store";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { APP_NAME } from "@/config";
@@ -82,11 +85,7 @@ export const LoginPage = () => {
                             className="absolute z-0 md:hidden"
                             style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                         />
-                        <div className="relative z-10 flex size-16 items-center justify-center rounded-full bg-success-50 dark:bg-success-900/30">
-                            <svg className="size-8 text-success-600" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
+                        <FeaturedIcon icon={Check} color="success" theme="light" size="xl" className="z-10" />
                     </div>
                     <div className="z-10 flex flex-col gap-2">
                         <h1 className="text-display-xs font-semibold text-primary">
@@ -127,11 +126,7 @@ export const LoginPage = () => {
                             className="absolute z-0 md:hidden"
                             style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                         />
-                        <div className="relative z-10 flex size-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/30">
-                            <svg className="size-8 text-red-600" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
+                        <FeaturedIcon icon={AlertCircle} color="error" theme="light" size="xl" className="z-10" />
                     </div>
                     <div className="z-10 flex flex-col gap-2">
                         <h1 className="text-display-xs font-semibold text-primary">
@@ -223,6 +218,16 @@ export const LoginPage = () => {
             {/* Login Form */}
             <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="flex flex-col gap-5">
+                    {error && (
+                        <AlertFloating
+                            title="Login Gagal"
+                            description={error}
+                            confirmLabel=""
+                            hideFooterActions
+                            color="error"
+                            onClose={() => setError(null)}
+                        />
+                    )}
                     <Input
                         isRequired
                         hideRequiredIndicator
@@ -250,10 +255,6 @@ export const LoginPage = () => {
                         </Link>
                     </div>
                 </div>
-
-                {error && (
-                    <p className="text-sm font-medium text-red-600">{error}</p>
-                )}
 
                 <Button
                     type="submit"
