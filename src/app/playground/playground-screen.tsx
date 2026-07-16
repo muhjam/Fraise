@@ -232,10 +232,8 @@ export const PlaygroundScreen = () => {
                         <button
                             onClick={() => setIsExitModalOpen(true)}
                             className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-secondary transition-colors"
-                            aria-label="Exit"
                         >
                             <Image src="/logo.png" className="object-contain animate-in fade-in zoom-in duration-200" alt="GatrAI Logo" width={28} height={28} />
-                            <span className="hidden md:inline text-sm font-semibold text-secondary">Exit</span>
                         </button>
                         <hr className="h-4 w-px bg-border-secondary md:h-6" />
                         <span className="text-xs font-semibold text-primary md:text-sm">
