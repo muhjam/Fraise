@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { CheckCircle, ChevronDown, Home01, RefreshCcw01, XCircle, Zap } from "@untitledui/icons";
+import { CheckCircle, ChevronDown, Home01, RefreshCcw01, XCircle, Zap, Lock01, LogIn01 } from "@untitledui/icons";
 import { Button } from "../../components/base/buttons/button";
 import { FeaturedIcon } from "../../components/foundations/featured-icon/featured-icon";
 import { useEffect, useState } from "react";
 import { useExamStore, useActiveExam } from "../../store/use-exam-store";
+import { useAuthStore } from "../../store/use-auth-store";
 import { cx } from "../../utils/cx";
 import { Markdown } from "../../components/shared-assets/markdown";
 import { calculateSimilarity } from "../../utils/string-similarity";
@@ -16,6 +17,7 @@ export const ResultScreen = () => {
     const id = params.id as string;
     const activeExam = useActiveExam();
     const { selectExam, exams, retryActiveExam } = useExamStore();
+    const user = useAuthStore((state) => state.user);
     const [isReviewOpen, setIsReviewOpen] = useState(false);
 
     // Sync active exam with URL
@@ -26,12 +28,58 @@ export const ResultScreen = () => {
     }, [id, activeExam?.id, selectExam]);
 
     if (!activeExam || (activeExam.id !== id && exams.find(e => e.id === id))) {
-        return <div className="flex h-dvh items-center justify-center">Loading results...</div>;
+        return <div className="flex h-dvh items-center justify-center">Memuat hasil...</div>;
     }
 
     if (!activeExam || activeExam.questions.length === 0) {
         router.push("/");
         return null;
+    }
+
+    // LOGIN GATE — if user not logged in, show gate instead of results
+    if (!user) {
+        return (
+            <div className="flex min-h-dvh flex-col items-center justify-center bg-primary px-4 py-16">
+                <div className="w-full max-w-md rounded-2xl border border-secondary bg-primary p-10 shadow-xl text-center flex flex-col items-center gap-6">
+                    <div className="flex size-16 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+                        <Lock01 className="size-8" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-2xl font-semibold text-primary">Login untuk Melihat Hasil</h1>
+                        <p className="text-sm text-tertiary leading-relaxed">
+                            Hasil ujianmu sudah siap! Buat akun atau login terlebih dahulu untuk melihat skor dan ulasan jawaban kamu.
+                        </p>
+                    </div>
+                    <div className="flex flex-col w-full gap-3">
+                        <Button
+                            size="lg"
+                            iconLeading={LogIn01}
+                            onClick={() => router.push(`/login?redirect=/result/${id}`)}
+                            className="w-full"
+                        >
+                            Login Sekarang
+                        </Button>
+                        <Button
+                            size="lg"
+                            color="secondary"
+                            onClick={() => router.push("/register")}
+                            className="w-full"
+                        >
+                            Daftar Gratis
+                        </Button>
+                        <Button
+                            size="sm"
+                            color="tertiary"
+                            iconLeading={Home01}
+                            onClick={() => router.push("/")}
+                            className="w-full"
+                        >
+                            Kembali ke Beranda
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     const { questions, userAnswers } = activeExam;
@@ -96,18 +144,18 @@ export const ResultScreen = () => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-display-sm font-semibold text-primary">Exam Completed!</h1>
+                        <h1 className="text-display-sm font-semibold text-primary">Ujian Selesai!</h1>
                         <p className="text-lg text-tertiary">
-                            You answered {correctAnswersCount} out of {gradableQuestions.length} questions correctly.
+                            Kamu menjawab {correctAnswersCount} dari {gradableQuestions.length} soal dengan benar.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <Button color="secondary" size="lg" iconLeading={RefreshCcw01} onClick={handleRestart}>
-                            Retry Test
+                            Ulangi Tes
                         </Button>
                         <Button size="lg" iconLeading={Home01} onClick={() => router.push("/")}>
-                            Back to Home
+                            Ke Beranda
                         </Button>
                     </div>
                 </div>
@@ -121,8 +169,8 @@ export const ResultScreen = () => {
                         className="flex w-full items-center justify-between rounded-xl border border-secondary bg-secondary/50 p-4 transition-all hover:bg-secondary"
                     >
                         <div className="flex flex-col items-start gap-1 text-left">
-                            <h2 className="text-lg font-semibold text-primary">Question Review</h2>
-                            <p className="text-sm text-tertiary">Check your answers and learn from your mistakes.</p>
+                            <h2 className="text-lg font-semibold text-primary">Ulasan Jawaban</h2>
+                            <p className="text-sm text-tertiary">Periksa jawabanmu dan belajar dari kesalahan.</p>
                         </div>
                         <div className={cx("transition-transform duration-300", isReviewOpen ? "rotate-180" : "")}>
                             <ChevronDown className="size-5 text-tertiary" />
@@ -187,7 +235,7 @@ export const ResultScreen = () => {
                                                 isCorrect ? "text-success-700" : "text-error-700"
                                             )}>
                                                 {isCorrect ? <CheckCircle className="size-4" /> : <XCircle className="size-4" />}
-                                                {isCorrect ? "Correct" : "Incorrect"}
+                                                {isCorrect ? "Benar" : "Salah"}
                                                 {(isWriting || q.skill.toLowerCase() === "speaking") && <span className="text-xs text-tertiary ml-1">({Math.round(similarity * 100)}% match)</span>}
                                             </div>
                                         )}
@@ -196,7 +244,7 @@ export const ResultScreen = () => {
                                     <Markdown content={q.description} className="text-md font-medium text-primary" />
 
                                     <div className="flex flex-col gap-2">
-                                        <div className="text-sm font-semibold text-secondary">Your Answer:</div>
+                                        <div className="text-sm font-semibold text-secondary">Jawabanmu:</div>
                                         <div className={cx(
                                             "rounded-lg border p-3 text-sm",
                                             (isMC || isWriting)
@@ -206,13 +254,13 @@ export const ResultScreen = () => {
                                             {userAnsDisplay ? (
                                                 <Markdown content={userAnsDisplay} className="text-sm font-medium" />
                                             ) : (
-                                                <span className="italic text-tertiary">Not answered</span>
+                                                <span className="italic text-tertiary">Tidak dijawab</span>
                                             )}
                                         </div>
 
                                         {!isCorrect && (isMC || isWriting || q.skill.toLowerCase() === "speaking") && (
                                             <div className="mt-1">
-                                                <div className="text-sm font-semibold text-success-700">Correct Answer:</div>
+                                                <div className="text-sm font-semibold text-success-700">Jawaban Benar:</div>
                                                 <div className="text-sm text-success-700 font-medium">
                                                     <Markdown content={q.answer.replace(/\|->/g, ", ")} className="text-sm font-medium" />
                                                 </div>
@@ -221,7 +269,7 @@ export const ResultScreen = () => {
 
                                         {!isMC && !isWriting && (
                                             <div className="mt-2 rounded-lg bg-brand-soft/10 border border-brand-200 p-4">
-                                                <div className="text-sm font-semibold text-brand-700">Evaluation Criteria / Sample Answer:</div>
+                                                <div className="text-sm font-semibold text-brand-700">Kriteria Penilaian / Contoh Jawaban:</div>
                                                 <Markdown content={q.answer} className="mt-1 text-sm text-brand-700" />
                                             </div>
                                         )}

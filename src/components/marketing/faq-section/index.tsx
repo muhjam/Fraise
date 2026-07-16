@@ -1,0 +1,105 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown } from "@untitledui/icons";
+import { cx } from "@/utils/cx";
+
+const FAQS = [
+    {
+        question: "Apakah Fraise benar-benar gratis?",
+        answer: "Ya! Kamu bisa mencoba Fraise secara gratis untuk 10 soal pertama tanpa perlu mendaftar. Setelah itu, kamu perlu membuat akun dan memilih paket yang sesuai untuk terus menggunakan layanan.",
+    },
+    {
+        question: "Bahasa apa saja yang tersedia?",
+        answer: "Saat ini Fraise mendukung 14+ bahasa termasuk Inggris, Jepang, Korea, Prancis, Spanyol, Mandarin, Arab, Jerman, Italia, Portugis, Rusia, Hindi, Sunda, dan Jawa. Kami terus menambahkan bahasa baru secara berkala.",
+    },
+    {
+        question: "Skill apa saja yang bisa diuji?",
+        answer: "Fraise mendukung 4 skill utama pembelajaran bahasa: Reading (membaca), Writing (menulis), Speaking (berbicara), dan Listening (mendengarkan). Kamu bisa memilih satu atau kombinasi beberapa skill sekaligus.",
+    },
+    {
+        question: "Bagaimana cara kerja pembuatan soal AI?",
+        answer: "Fraise menggunakan berbagai provider AI terkemuka (Groq, Google Gemini, OpenAI, Anthropic Claude) untuk menghasilkan soal yang unik dan relevan setiap kali kamu membuat ujian. Soal dijamin tidak pernah sama dua kali.",
+    },
+    {
+        question: "Apa itu Custom API Key?",
+        answer: "Pengguna paket Eksklusif dan Luxury dapat menggunakan API key mereka sendiri dari provider pilihan. Ini memungkinkan kamu melewati batas kuota global dan menggunakan model AI favoritmu secara langsung.",
+    },
+    {
+        question: "Bagaimana cara membayar?",
+        answer: "Untuk saat ini, pembayaran dilakukan melalui transfer manual. Setelah pembayaran dikonfirmasi, akun kamu akan langsung ditingkatkan. Hubungi kami via WhatsApp di nomor 081257578571 untuk informasi lebih lanjut.",
+    },
+    {
+        question: "Apakah hasil ujian tersimpan?",
+        answer: "Ya, riwayat ujian tersimpan di perangkatmu (local storage). Kamu bisa melihat kembali semua soal dan jawabanmu kapan saja melalui tombol History di halaman utama. Login diperlukan untuk melihat detail hasil ujian.",
+    },
+    {
+        question: "Berapa lama akses paket berlaku?",
+        answer: "Akses paket berlaku selama 30 hari sejak aktivasi. Setelah masa berlaku habis, kamu bisa memperpanjang dengan pembelian baru. Kami juga menyediakan paket bulanan dan tahunan dengan harga yang lebih terjangkau.",
+    },
+];
+
+const FaqItem = ({ question, answer }: { question: string; answer: string }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="border-b border-secondary last:border-b-0">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex w-full items-center justify-between gap-4 py-5 text-left"
+            >
+                <span className="text-md font-semibold text-primary">{question}</span>
+                <ChevronDown
+                    className={cx(
+                        "size-5 shrink-0 text-tertiary transition-transform duration-300",
+                        isOpen ? "rotate-180" : ""
+                    )}
+                />
+            </button>
+            <div className={cx(
+                "grid transition-all duration-300 ease-in-out",
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            )}>
+                <div className="min-h-0 overflow-hidden">
+                    <p className="pb-5 text-md text-tertiary leading-relaxed">{answer}</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const FaqSection = () => {
+    return (
+        <section className="w-full py-16 md:py-24">
+            <div className="mx-auto w-full max-w-container px-4 md:px-8">
+                <div className="flex flex-col gap-12 lg:flex-row lg:gap-16">
+                    {/* Left: heading */}
+                    <div className="flex flex-col gap-4 lg:w-80 lg:shrink-0">
+                        <h2 className="text-display-sm font-semibold text-primary md:text-display-md">
+                            Pertanyaan yang Sering Diajukan
+                        </h2>
+                        <p className="text-md text-tertiary">
+                            Ada pertanyaan lain? Hubungi kami langsung via{" "}
+                            <a
+                                href="https://wa.me/6281257578571?text=Halo%2C%20saya%20ingin%20bertanya%20tentang%20Fraise"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-semibold text-brand-700 hover:text-brand-800 hover:underline"
+                            >
+                                WhatsApp
+                            </a>
+                            .
+                        </p>
+                    </div>
+
+                    {/* Right: FAQ items */}
+                    <div className="flex-1 divide-y divide-secondary rounded-2xl border border-secondary bg-primary px-6 py-2 shadow-sm">
+                        {FAQS.map((faq) => (
+                            <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};

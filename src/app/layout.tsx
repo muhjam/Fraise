@@ -14,15 +14,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Vibe Language by Jamjam | AI-Powered Multilingual Proficiency Testing",
-    description: "Empower your language learning with Vibe Language. Generate personalized, always-unique proficiency tests for Reading, Writing, Speaking, and Listening in 14+ languages. Practice with fresh content every time and master any language for free.",
+    title: "Fraise by Jamjam | AI-Powered Multilingual Proficiency Testing",
+    description: "Empower your language learning with Fraise. Generate personalized, always-unique proficiency tests for Reading, Writing, Speaking, and Listening in 14+ languages. Practice with fresh content every time and master any language for free.",
     icons: {
         icon: "/logo.png",
     },
 };
 
 export const viewport: Viewport = {
-    themeColor: "#7f56d9",
+    themeColor: "#7839ee",
     colorScheme: "light dark",
 };
 

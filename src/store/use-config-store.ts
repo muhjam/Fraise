@@ -120,7 +120,7 @@ export const useConfigStore = create<ConfigState>()(
             }
         }),
         {
-            name: "vibe-config-storage",
+            name: "fraise-config-storage",
         }
     )
 );

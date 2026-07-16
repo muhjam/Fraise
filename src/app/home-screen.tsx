@@ -1,18 +1,18 @@
 "use client";
 
-import { useExamStore } from "../store/use-exam-store";
 import { ThemeToggle } from "../components/foundations/theme-toggle";
-import { UntitledLogoMinimal } from "../components/foundations/logo/untitledui-logo-minimal";
 import { Badge } from "../components/base/badges/badges";
+import { Button } from "../components/base/buttons/button";
 import { HeroSection } from "../components/exam/hero-section";
-import { ExamHistory } from "../components/exam/exam-history";
+import { PricingPlansSection } from "../components/marketing/pricing-sections/pricing-plans-section";
+import { FaqSection } from "../components/marketing/faq-section";
+import { Footer } from "../components/marketing/footer";
+import Image from "next/image";
 
 export const HomeScreen = () => {
-    const exams = useExamStore((state) => state.exams);
-
     return (
         <div className="flex min-h-dvh flex-col bg-primary relative">
-            {/* Background decorative elements - Moved overflow-hidden here locally if needed */}
+            {/* Background decorative elements */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
                 <div className="absolute -top-[10%] -left-[10%] size-[40%] rounded-full bg-brand-soft/20 blur-[120px]" />
                 <div className="absolute -bottom-[10%] -right-[10%] size-[40%] rounded-full bg-brand-soft/20 blur-[120px]" />
@@ -20,29 +20,37 @@ export const HomeScreen = () => {
 
             <header className="relative mx-auto flex w-full max-w-container items-center justify-between px-4 py-6 md:px-8">
                 <div className="flex items-center gap-2">
-                    <UntitledLogoMinimal className="size-8" />
-                    <span className="text-xl font-bold text-primary">Vibe Language</span>
-                    <Badge color="success">Beta</Badge>
+                    <Image src="/logo.png" className="object-contain" alt="Fraise Logo" width={80} height={80} />
+                    <Image src="/title-dark.png" className="object-contain dark:hidden" alt="Fraise Logo" width={100} height={100} />
+                    <Image src="/title-light.png" className="object-contain hidden dark:block" alt="Fraise Logo" width={100} height={100} />
+                    {/* <Badge color="success">AI Powered</Badge> */}
                 </div>
-                <ThemeToggle />
+                <div className="flex items-center gap-3">
+                    <ThemeToggle />
+                    <Button size="sm" color="secondary" href="/login">
+                        Masuk
+                    </Button>
+                    <Button size="sm" href="/register" className="hidden sm:flex">
+                        Daftar Gratis
+                    </Button>
+                </div>
             </header>
 
             <main className="relative flex flex-1 flex-col items-center">
                 <HeroSection />
 
-                {/* History Section */}
-                {exams.length > 0 && (
-                    <section className="mx-auto w-full max-w-container px-4 py-16 flex flex-col items-center md:px-8 bg-secondary/30 rounded-3xl mb-20">
-                        <ExamHistory />
-                    </section>
-                )}
+                {/* Pricing section with anchor */}
+                <div id="pricing" className="w-full">
+                    <PricingPlansSection />
+                </div>
+
+                {/* FAQ section with anchor */}
+                <div id="faq" className="w-full">
+                    <FaqSection />
+                </div>
             </main>
 
-            <footer className="mx-auto w-full max-w-container px-4 py-8 md:px-8">
-                <p className="text-center text-sm text-tertiary">
-                    &copy; 2026 Vibe Language by <a href="https://github.com/muhjam" target="_blank" className="hover:underline">Jamjam</a>. Developed with Antigravity.
-                </p>
-            </footer>
+            <Footer />
         </div>
     );
 };

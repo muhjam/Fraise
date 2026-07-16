@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen01, Zap, PlayCircle } from "@untitledui/icons";
+import { BookOpen01, Zap, PlayCircle, MessageChatSquare, CheckVerified01 } from "@untitledui/icons";
 import { FeaturedIcon } from "../../foundations/featured-icon/featured-icon";
 import { Button } from "@/components/base/buttons/button";
 
@@ -13,31 +13,46 @@ export const HeroContent = () => {
 
             <div className="flex flex-col gap-4">
                 <h1 className="text-display-md font-semibold text-primary lg:text-display-lg">
-                    Master Any Language with AI-Powered Testing
+                    Kuasai Bahasa Apa Saja dengan AI
                 </h1>
                 <p className="text-lg text-tertiary lg:text-xl">
-                    Generate personalized exams in seconds. Practice Reading, Writing, Speaking, and Listening in 14+ languages with always-unique questions ensuring you never encounter the same test twice.
+                    Buat soal ujian yang dipersonalisasi dalam hitungan detik. Latih Reading, Writing, Speaking, dan Listening dalam 14+ bahasa dengan soal yang selalu unik. Dan hasil penilaian langsung muncul tanpa harus menunggu.
                 </p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
+            <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
                 <div className="flex items-center gap-2 rounded-full border border-secondary bg-primary px-3 py-1 text-sm font-medium text-secondary">
                     <BookOpen01 className="size-4" />
-                    <span>Learn faster</span>
+                    <span>Belajar lebih cepat</span>
                 </div>
                 <div className="flex items-center gap-2 rounded-full border border-secondary bg-primary px-3 py-1 text-sm font-medium text-secondary">
                     <Zap className="size-4" />
-                    <span>AI Generated</span>
+                    <span>Dibuat oleh AI</span>
+                </div>
+                <div className="flex items-center gap-2 rounded-full border border-secondary bg-primary px-3 py-1 text-sm font-medium text-secondary">
+                    <CheckVerified01 className="size-4"/>
+                    <span>Gratis Percobaan</span>
                 </div>
             </div>
 
-            <Button
-                className="w-fit mx-auto px-12 lg:hidden"
-                iconLeading={PlayCircle}
-                onClick={() => document.getElementById("setup-exam")?.scrollIntoView({ behavior: "smooth" })}
-            >
-                Start
-            </Button>
+            <div className="flex flex-col gap-3 sm:flex-row items-center justify-center lg:justify-start">
+                <Button
+                    className="w-fit px-12 lg:hidden"
+                    iconLeading={PlayCircle}
+                    onClick={() => document.getElementById("setup-exam")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                    Mulai Sekarang
+                </Button>
+                <a
+                    href="https://wa.me/6281257578571?text=Halo%2C%20saya%20ingin%20bertanya%20tentang%20Fraise"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-sm bg-[#25D366] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1ebe5d] transition-colors"
+                >
+                    <MessageChatSquare className="size-4" />
+                    Hubungi via WhatsApp
+                </a>
+            </div>
         </div>
     );
 };

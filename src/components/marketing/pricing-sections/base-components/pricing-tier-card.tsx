@@ -357,6 +357,7 @@ export const PricingTierCardBanner = (props: {
     features: string[];
     className?: string;
     secondAction?: string;
+    originalPrice?: string;
 }) => {
     return (
         <div className={cx("flex flex-col overflow-hidden rounded-2xl bg-primary shadow-lg ring-1 ring-secondary_alt", props.className)}>
@@ -368,18 +369,20 @@ export const PricingTierCardBanner = (props: {
 
             <div>
                 <div className="flex flex-col items-center px-6 pt-8 text-center md:px-8">
-                    <p className="text-display-md font-semibold text-primary md:text-display-lg">{props.subtitle}</p>
+                    <div className="relative flex items-center gap-1">
+                        {props.originalPrice && (
+                           <p className="font-semibold text-lg absolute top-[-15px] left-0 right-0"> 
+                            PROMO{" "}
+                            <span className="font-medium text-tertiary line-through">{props.originalPrice}</span>
+                            </p>
+                        )}
+                        <p className={"text-display-md font-semibold text-primary md:text-display-lg"}>{props.subtitle}</p>
+                    </div>
                     <h2 className="mt-4 text-xl font-semibold text-primary">{props.title}</h2>
                     <p className="mt-1 text-md text-tertiary">{props.description}</p>
                 </div>
 
-                <ul className="flex flex-col gap-4 px-6 py-8 md:px-8 md:pb-10">
-                    {props.features.map((feat) => (
-                        <CheckItemText key={feat} iconStyle="outlined" color="success" text={feat} />
-                    ))}
-                </ul>
-
-                <div className="mt-auto flex flex-col gap-3 px-6 pb-8 md:px-8">
+                  <div className="mt-auto flex flex-col gap-3 px-6 py-8 md:px-8">
                     <Button size="xl">Get started</Button>
                     {props.secondAction && (
                         <Button color="secondary" size="xl">
@@ -387,6 +390,12 @@ export const PricingTierCardBanner = (props: {
                         </Button>
                     )}
                 </div>
+
+                <ul className="flex flex-col gap-4 px-6 md:px-8 pb-10">
+                    {props.features.map((feat) => (
+                        <CheckItemText key={feat} iconStyle="outlined" color="success" text={feat} />
+                    ))}
+                </ul>
             </div>
         </div>
     );
