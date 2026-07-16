@@ -14,6 +14,7 @@ import { CustomKeyModal } from "@/components/exam/custom-key-modal";
 import { HistorySlideout } from "@/components/exam/history-slideout";
 import { cx } from "@/utils/cx";
 import { useToast } from "@/contexts/use-toast";
+import { useAuthStore } from "@/store/use-auth-store";
 
 const FREE_LIMIT = 10;
 
@@ -58,7 +59,7 @@ const TrialLimitModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <div className="flex flex-col gap-2">
                         <h2 className="text-xl font-semibold text-primary">Kuota Gratis Habis</h2>
                         <p className="text-sm text-tertiary leading-relaxed">
-                            Kamu sudah menggunakan <strong>{FREE_LIMIT} soal gratis</strong> hari ini. Buat akun atau login untuk melanjutkan dan mendapatkan akses lebih banyak soal.
+                            Kamu sudah menggunakan <strong>{FREE_LIMIT} soal gratis</strong>. Buat akun atau login untuk melanjutkan dan mendapatkan akses lebih banyak soal.
                         </p>
                     </div>
                     <div className="flex flex-col w-full gap-3">
@@ -95,6 +96,7 @@ export const ConfigForm = () => {
     const router = useRouter();
     const { toastSuccess, toastError, toastWarning } = useToast();
     const createExamAction = useExamStore((state) => state.createNewExam);
+    const user = useAuthStore((state) => state.user);
 
     const {
         provider, setProvider,
@@ -113,6 +115,10 @@ export const ConfigForm = () => {
     const [isTrialLimitOpen, setIsTrialLimitOpen] = useState(false);
     const [trialUsed, setTrialUsed] = useState(0);
     const [trialChecked, setTrialChecked] = useState(false);
+
+    // Determine if user is on a free/locked plan (not logged in OR no paid plan)
+    // For now: if not logged in → locked (Auto only, no settings)
+    const isLockedPlan = !user;
 
     // Initial status checks
     useEffect(() => {
@@ -218,6 +224,13 @@ export const ConfigForm = () => {
     const hasActiveCustomKey = !!customApiKeys[provider];
     const remaining = Math.max(0, FREE_LIMIT - trialUsed);
 
+    // Build the hint text for question count input
+    const questionCountHint = trialChecked
+        ? remaining > 0
+            ? `Sisa kuota gratis: ${remaining} soal`
+            : "Kuota gratis habis — login untuk lanjut"
+        : "Maks. 10 soal selama versi Beta.";
+
     return (
         <>
             <TrialLimitModal isOpen={isTrialLimitOpen} onClose={() => setIsTrialLimitOpen(false)} />
@@ -233,20 +246,6 @@ export const ConfigForm = () => {
                     <p className="text-sm text-tertiary">
                         Konfigurasi parameter untuk menghasilkan soal bertenaga AI. Gratis untuk 10 soal pertama.
                     </p>
-                    {trialChecked && (
-                        <div className={cx(
-                            "flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium",
-                            remaining > 0
-                                ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400"
-                                : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
-                        )}>
-                            {remaining > 0 ? (
-                                <><span>🎁</span> Sisa kuota gratis: <strong>{remaining} soal</strong></>
-                            ) : (
-                                <><Lock01 className="size-3" /> Kuota gratis habis — login untuk lanjut</>
-                            )}
-                        </div>
-                    )}
                 </div>
 
                 <div className="flex flex-col gap-6">
@@ -280,7 +279,7 @@ export const ConfigForm = () => {
                         </div>
                     </div>
 
-                    {/* Question Count */}
+                    {/* Question Count — hint shows quota */}
                     <div className="flex flex-col gap-1.5">
                         <Input
                             label="Jumlah Soal"
@@ -293,7 +292,7 @@ export const ConfigForm = () => {
                             }}
                             placeholder="Contoh: 10"
                             icon={File06}
-                            hint="Maks. 10 soal selama versi Beta."
+                            hint={questionCountHint}
                         />
                     </div>
 
@@ -312,9 +311,24 @@ export const ConfigForm = () => {
 
                         {isAdvancedOpen && (
                             <div className="mt-6 flex flex-col gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                                {/* Provider */}
-                                <div className="flex flex-col gap-1.5">
+                                {/* Auto checkbox — always on and disabled for locked plan */}
+                                <div className="flex items-center justify-between">
                                     <Label>Provider AI</Label>
+                                    <div className="flex items-center gap-2">
+                                        <span className={cx(
+                                            "text-sm font-medium",
+                                            isLockedPlan ? "text-tertiary" : "text-primary"
+                                        )}>Auto</span>
+                                        <Checkbox
+                                            isSelected={isLockedPlan ? true : provider === "groq"}
+                                            onChange={() => {}}
+                                            isDisabled={isLockedPlan}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Provider selector — hidden for locked plan */}
+                                {!isLockedPlan && (
                                     <Select
                                         selectedKey={provider}
                                         onSelectionChange={(key) => {
@@ -344,30 +358,39 @@ export const ConfigForm = () => {
                                             );
                                         })}
                                     </Select>
-                                </div>
+                                )}
 
-                                {/* Model */}
-                                <div className="flex flex-col gap-1.5">
-                                    <Label>Nama Model</Label>
-                                    <Select
-                                        selectedKey={modelName}
-                                        onSelectionChange={(key) => setModelName(key as string)}
-                                        placeholderIcon={<StatusDot color={dotColor} />}
-                                    >
-                                        {models.map((m) => (
-                                            <Select.Item
-                                                key={m.id}
-                                                id={m.id}
-                                                label={m.name}
-                                                icon={<StatusDot color={dotColor} />}
-                                            >
-                                                {m.name}
-                                            </Select.Item>
-                                        ))}
-                                    </Select>
-                                </div>
+                                {/* Model — hidden for locked plan */}
+                                {!isLockedPlan && (
+                                    <div className="flex flex-col gap-1.5">
+                                        <Label>Nama Model</Label>
+                                        <Select
+                                            selectedKey={modelName}
+                                            onSelectionChange={(key) => setModelName(key as string)}
+                                            placeholderIcon={<StatusDot color={dotColor} />}
+                                        >
+                                            {models.map((m) => (
+                                                <Select.Item
+                                                    key={m.id}
+                                                    id={m.id}
+                                                    label={m.name}
+                                                    icon={<StatusDot color={dotColor} />}
+                                                >
+                                                    {m.name}
+                                                </Select.Item>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                )}
 
-                                {hasActiveCustomKey && (
+                                {/* Lock notice for free plan */}
+                                {isLockedPlan && (
+                                    <p className="text-xs text-tertiary">
+                                        Login dan upgrade paket untuk memilih provider AI secara manual.
+                                    </p>
+                                )}
+
+                                {hasActiveCustomKey && !isLockedPlan && (
                                     <div className={cx(
                                         "flex items-center justify-between rounded-xl border p-3 transition-all duration-300",
                                         "border-green-200 bg-green-50 dark:border-green-500/30 dark:bg-green-500/5"
@@ -387,9 +410,15 @@ export const ConfigForm = () => {
                                     color="secondary"
                                     size="sm"
                                     iconLeading={Zap}
-                                    onClick={() => setIsModalOpen(true)}
+                                    onClick={() => isLockedPlan ? router.push("/login") : setIsModalOpen(true)}
+                                    disabled={isLockedPlan}
                                 >
-                                    {hasActiveCustomKey ? `Kelola API Key ${provider.toUpperCase()}` : `Gunakan API Key ${provider.toUpperCase()} Sendiri`}
+                                    {isLockedPlan
+                                        ? "Login untuk Gunakan API Key Sendiri"
+                                        : hasActiveCustomKey
+                                            ? `Kelola API Key ${provider.toUpperCase()}`
+                                            : `Gunakan API Key ${provider.toUpperCase()} Sendiri`
+                                    }
                                 </Button>
                             </div>
                         )}

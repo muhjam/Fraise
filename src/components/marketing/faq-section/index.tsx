@@ -43,10 +43,10 @@ const FaqItem = ({ question, answer }: { question: string; answer: string }) => 
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="border-b border-secondary last:border-b-0">
+        <div className="rounded-2xl border border-secondary bg-primary shadow-xs overflow-hidden transition-shadow hover:shadow-sm">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
             >
                 <span className="text-md font-semibold text-primary">{question}</span>
                 <ChevronDown
@@ -61,7 +61,7 @@ const FaqItem = ({ question, answer }: { question: string; answer: string }) => 
                 isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
             )}>
                 <div className="min-h-0 overflow-hidden">
-                    <p className="pb-5 text-md text-tertiary leading-relaxed">{answer}</p>
+                    <p className="px-6 pb-5 text-md text-tertiary leading-relaxed">{answer}</p>
                 </div>
             </div>
         </div>
@@ -70,34 +70,32 @@ const FaqItem = ({ question, answer }: { question: string; answer: string }) => 
 
 export const FaqSection = () => {
     return (
-        <section className="w-full py-16 md:py-24">
+        <section className="w-full py-10 md:py-16">
             <div className="mx-auto w-full max-w-container px-4 md:px-8">
-                <div className="flex flex-col gap-12 lg:flex-row lg:gap-16">
-                    {/* Left: heading */}
-                    <div className="flex flex-col gap-4 lg:w-80 lg:shrink-0">
-                        <h2 className="text-display-sm font-semibold text-primary md:text-display-md">
-                            Pertanyaan yang Sering Diajukan
-                        </h2>
-                        <p className="text-md text-tertiary">
-                            Ada pertanyaan lain? Hubungi kami langsung via{" "}
-                            <a
-                                href="https://wa.me/6281257578571?text=Halo%2C%20saya%20ingin%20bertanya%20tentang%20Fraise"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-semibold text-brand-700 hover:text-brand-800 hover:underline"
-                            >
-                                WhatsApp
-                            </a>
-                            .
-                        </p>
-                    </div>
+                {/* Center heading */}
+                <div className="flex flex-col items-center gap-4 text-center mb-12">
+                    <h2 className="text-display-sm font-semibold text-primary md:text-display-md">
+                        Pertanyaan yang Sering Diajukan
+                    </h2>
+                    <p className="text-md text-tertiary max-w-lg">
+                        Ada pertanyaan lain? Hubungi kami langsung via{" "}
+                        <a
+                            href="https://wa.me/6281257578571?text=Halo%2C%20saya%20ingin%20bertanya%20tentang%20Fraise"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold text-brand-700 hover:text-brand-800 hover:underline"
+                        >
+                            WhatsApp
+                        </a>
+                        .
+                    </p>
+                </div>
 
-                    {/* Right: FAQ items */}
-                    <div className="flex-1 divide-y divide-secondary rounded-2xl border border-secondary bg-primary px-6 py-2 shadow-sm">
-                        {FAQS.map((faq) => (
-                            <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
-                        ))}
-                    </div>
+                {/* Vertical stack of individual cards */}
+                <div className="flex flex-col gap-3 max-w-3xl mx-auto">
+                    {FAQS.map((faq) => (
+                        <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+                    ))}
                 </div>
             </div>
         </section>

@@ -54,7 +54,7 @@ const getPlanFeatures = (plan: PricingPlan): string[] => {
 
 export const PricingPlansSection = () => {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-10 md:py-16">
       <div className="mx-auto w-full max-w-container px-4 md:px-8">
         <div className="text-center mb-12">
           <h2 className="text-display-md font-semibold text-primary md:text-display-lg">
@@ -156,16 +156,6 @@ export const PricingPlansSection = () => {
               </tbody>
             </table>
           </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-tertiary">
-            Semua paket termasuk akses ke semua bahasa, semua skill tes (Reading, Writing, Speaking, Listening), dan selalu-unique questions.
-          </p>
-          <p className="mt-2 text-sm text-tertiary">
-            Tidak ada kontrak jangka panjang - batalkan kapan saja.
-          </p>
         </div>
       </div>
     </section>

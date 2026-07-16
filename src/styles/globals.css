@@ -10,6 +10,11 @@
 @custom-variant label (& [data-label]);
 @custom-variant focus-input-within (&:has(input:focus));
 
+/* Prevent horizontal scrollbar without breaking sticky positioning */
+body {
+    overflow-x: clip;
+}
+
 @utility scrollbar-hide {
 
     /* For Webkit-based browsers (Chrome, Safari and Opera) */
