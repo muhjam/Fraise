@@ -6,20 +6,20 @@ import { cx } from "@/utils/cx";
 
 const FAQS = [
     {
-        question: "Apakah Fraise benar-benar gratis?",
-        answer: "Ya! Kamu bisa mencoba Fraise secara gratis untuk 10 soal pertama tanpa perlu mendaftar. Setelah itu, kamu perlu membuat akun dan memilih paket yang sesuai untuk terus menggunakan layanan.",
+        question: "Apakah GatrAI benar-benar gratis?",
+        answer: "Ya! Kamu bisa mencoba GatrAI secara gratis untuk 10 soal pertama tanpa perlu mendaftar. Setelah itu, kamu perlu membuat akun dan memilih paket yang sesuai untuk terus menggunakan layanan.",
     },
     {
         question: "Bahasa apa saja yang tersedia?",
-        answer: "Saat ini Fraise mendukung 14+ bahasa termasuk Inggris, Jepang, Korea, Prancis, Spanyol, Mandarin, Arab, Jerman, Italia, Portugis, Rusia, Hindi, Sunda, dan Jawa. Kami terus menambahkan bahasa baru secara berkala.",
+        answer: "Saat ini GatrAI mendukung 14+ bahasa termasuk Inggris, Jepang, Korea, Prancis, Spanyol, Mandarin, Arab, Jerman, Italia, Portugis, Rusia, Hindi, Sunda, dan Jawa. Kami terus menambahkan bahasa baru secara berkala.",
     },
     {
         question: "Skill apa saja yang bisa diuji?",
-        answer: "Fraise mendukung 4 skill utama pembelajaran bahasa: Reading (membaca), Writing (menulis), Speaking (berbicara), dan Listening (mendengarkan). Kamu bisa memilih satu atau kombinasi beberapa skill sekaligus.",
+        answer: "GatrAI mendukung 4 skill utama pembelajaran bahasa: Reading (membaca), Writing (menulis), Speaking (berbicara), dan Listening (mendengarkan). Kamu bisa memilih satu atau kombinasi beberapa skill sekaligus.",
     },
     {
         question: "Bagaimana cara kerja pembuatan soal AI?",
-        answer: "Fraise menggunakan berbagai provider AI terkemuka (Groq, Google Gemini, OpenAI, Anthropic Claude) untuk menghasilkan soal yang unik dan relevan setiap kali kamu membuat ujian. Soal dijamin tidak pernah sama dua kali.",
+        answer: "GatrAI menggunakan berbagai provider AI terkemuka (Groq, Google Gemini, OpenAI, Anthropic Claude) untuk menghasilkan soal yang unik dan relevan setiap kali kamu membuat ujian. Soal dijamin tidak pernah sama dua kali.",
     },
     {
         question: "Apa itu Custom API Key?",

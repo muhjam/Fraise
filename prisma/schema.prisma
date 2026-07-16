@@ -9,32 +9,20 @@ datasource db {
 }
 
 enum Role {
-  OWNER
-  TEACHER
-  STUDENT
-}
-
-model Bimbel {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users   User[]
-  modules Module[]
-
-  @@map("bimbels")
+  USER
+  SUPER_ADMIN
 }
 
 model User {
-  id           String @id @default(uuid())
-  name         String @default("")
-  email        String @unique
+  id           String  @id @default(uuid())
+  name         String  @default("")
+  email        String  @unique
   passwordHash String
-  role         Role
+  role         Role    @default(USER)
 
-  bimbelId String?
-  bimbel   Bimbel? @relation(fields: [bimbelId], references: [id])
+  // Account verification
+  isVerified          Boolean @default(false)
+  activationTokenHash String?
 
   // Password reset fields
   resetTokenHash   String?
@@ -43,35 +31,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // A teacher or owner who creates the module
-  createdModules Module[] @relation("ModuleCreator")
-
   @@map("users")
 }
 
-model Module {
-  id      String  @id @default(uuid())
-  title   String
-  content String? @db.Text
-
-  bimbelId String
-  bimbel   Bimbel @relation(fields: [bimbelId], references: [id], onDelete: Cascade)
-
-  createdBy String
-  author    User   @relation("ModuleCreator", fields: [createdBy], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("modules")
-}
-
 model IpTrial {
-  id             String   @id @default(uuid())
-  ip             String   @unique
-  questionsUsed  Int      @default(0)
-  lastUsedAt     DateTime @default(now())
-  createdAt      DateTime @default(now())
+  id            String   @id @default(uuid())
+  ip            String   @unique
+  questionsUsed Int      @default(0)
+  lastUsedAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
 
   @@map("ip_trials")
 }

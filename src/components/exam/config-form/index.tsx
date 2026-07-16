@@ -11,7 +11,6 @@ import { SkillType, useExamStore } from "@/store/use-exam-store";
 import { useConfigStore, DEFAULT_MODELS, AIProvider } from "@/store/use-config-store";
 import { ChevronDown, ChevronUp, Settings01, File06, Zap, Translate01, Lock01, LogIn01 } from "@untitledui/icons";
 import { CustomKeyModal } from "@/components/exam/custom-key-modal";
-import { HistorySlideout } from "@/components/exam/history-slideout";
 import { cx } from "@/utils/cx";
 import { useToast } from "@/contexts/use-toast";
 import { useAuthStore } from "@/store/use-auth-store";
@@ -186,14 +185,14 @@ export const ConfigForm = () => {
                 language,
                 questionCount,
                 skills: selectedSkills,
-            });
+            }, user?.email ?? undefined);
 
             // Increment IP trial counter
             await fetch("/api/trial", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ count: questionCount }),
-            }).catch(() => {});
+            }).catch(() => { });
 
             toastSuccess("Soal sedang dibuat, mohon tunggu.", "Berhasil");
             router.push(`/playground/${examId}`);
@@ -225,23 +224,21 @@ export const ConfigForm = () => {
     const remaining = Math.max(0, FREE_LIMIT - trialUsed);
 
     // Build the hint text for question count input
-    const questionCountHint = trialChecked
-        ? remaining > 0
-            ? `Sisa kuota gratis: ${remaining} soal`
-            : "Kuota gratis habis — login untuk lanjut"
-        : "Maks. 10 soal selama versi Beta.";
+    const questionCountHint = (() => {
+        if (!trialChecked) return "Maks. 10 soal selama versi Beta.";
+        if (remaining <= 0) return "Kuota gratis habis — login untuk lanjut.";
+        const tokenEst = questionCount > 0 ? `Perkiraan: ${questionCount} token digunakan.` : "";
+        return `Sisa kuota gratis: ${remaining} soal. ${tokenEst}`.trim();
+    })();
 
     return (
         <>
             <TrialLimitModal isOpen={isTrialLimitOpen} onClose={() => setIsTrialLimitOpen(false)} />
 
-            <div className="flex w-full md:max-w-md md:mx-auto flex-col gap-8 rounded-2xl border border-secondary bg-primary p-6 shadow-sm">
+            <div className="flex w-full flex-col gap-8 rounded-2xl border border-secondary bg-primary p-6 shadow-sm">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-display-xs font-semibold text-primary">Coba Buat Soal</h2>
-                        <div className="flex items-center gap-3">
-                            <HistorySlideout />
-                        </div>
+                        <h2 className="text-display-xs font-semibold text-primary">Buat Soal</h2>
                     </div>
                     <p className="text-sm text-tertiary">
                         Konfigurasi parameter untuk menghasilkan soal bertenaga AI. Gratis untuk 10 soal pertama.
@@ -321,7 +318,20 @@ export const ConfigForm = () => {
                                         )}>Auto</span>
                                         <Checkbox
                                             isSelected={isLockedPlan ? true : provider === "groq"}
-                                            onChange={() => {}}
+                                            onChange={(checked) => {
+                                                if (!isLockedPlan) {
+                                                    if (checked) {
+                                                        setProvider("groq");
+                                                        const firstModel = DEFAULT_MODELS["groq"]?.[0]?.id;
+                                                        if (firstModel) setModelName(firstModel);
+                                                    } else {
+                                                        // Switch to gemini as default manual provider
+                                                        setProvider("gemini");
+                                                        const firstModel = DEFAULT_MODELS["gemini"]?.[0]?.id;
+                                                        if (firstModel) setModelName(firstModel);
+                                                    }
+                                                }
+                                            }}
                                             isDisabled={isLockedPlan}
                                         />
                                     </div>

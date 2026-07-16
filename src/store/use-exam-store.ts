@@ -29,6 +29,7 @@ export interface ExamAttempt {
     currentQuestionIndex: number;
     startTime: number | null;
     endTime: number | null;
+    ownedBy?: string;
 }
 
 interface ExamState {
@@ -38,7 +39,7 @@ interface ExamState {
 
     // Actions
     setHasHydrated: (val: boolean) => void;
-    createNewExam: (config: ExamConfig) => string;
+    createNewExam: (config: ExamConfig, ownedBy?: string) => string;
     selectExam: (id: string) => void;
     deleteExam: (id: string) => void;
 
@@ -62,7 +63,7 @@ export const useExamStore = create<ExamState>()(
 
             setHasHydrated: (val) => set({ hasHydrated: val }),
 
-            createNewExam: (config) => {
+            createNewExam: (config, ownedBy) => {
                 const id = crypto.randomUUID();
                 const newExam: ExamAttempt = {
                     id,
@@ -74,6 +75,7 @@ export const useExamStore = create<ExamState>()(
                     currentQuestionIndex: 0,
                     startTime: null,
                     endTime: null,
+                    ownedBy,
                 };
                 set((state) => ({
                     exams: [newExam, ...state.exams],
@@ -145,19 +147,19 @@ export const useExamStore = create<ExamState>()(
                         e.id === state.activeExamId ? { ...e, status: "completed", endTime: Date.now() } : e
                     ),
                 })),
-            
+
             retryActiveExam: () =>
                 set((state) => ({
                     exams: state.exams.map((e) =>
                         e.id === state.activeExamId
                             ? {
-                                  ...e,
-                                  status: "ongoing",
-                                  userAnswers: {},
-                                  currentQuestionIndex: 0,
-                                  startTime: Date.now(),
-                                  endTime: null,
-                              }
+                                ...e,
+                                status: "ongoing",
+                                userAnswers: {},
+                                currentQuestionIndex: 0,
+                                startTime: Date.now(),
+                                endTime: null,
+                            }
                             : e
                     ),
                 })),

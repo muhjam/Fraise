@@ -3,8 +3,8 @@ import { PageLayout } from "@/components/layout/page-layout";
 import { ContactSection } from "@/components/marketing/contact-section";
 
 export const metadata: Metadata = {
-    title: "Hubungi Kami — Fraise",
-    description: "Punya pertanyaan atau ingin berkolaborasi? Hubungi tim Fraise melalui form atau kontak langsung kami.",
+    title: "Hubungi Kami — GatrAI",
+    description: "Punya pertanyaan atau ingin berkolaborasi? Hubungi tim GatrAI melalui form atau kontak langsung kami.",
 };
 
 export default function HubungiPage() {

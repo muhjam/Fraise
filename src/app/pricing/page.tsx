@@ -3,8 +3,8 @@ import { PageLayout } from "@/components/layout/page-layout";
 import { PricingPlansSection } from "@/components/marketing/pricing-sections/pricing-plans-section";
 
 export const metadata: Metadata = {
-    title: "Harga — Fraise",
-    description: "Pilih paket Fraise yang sesuai kebutuhanmu. Mulai gratis hingga paket Luxury dengan akses provider AI terbaik.",
+    title: "Harga — GatrAI",
+    description: "Pilih paket GatrAI yang sesuai kebutuhanmu. Mulai gratis hingga paket Luxury dengan akses provider AI terbaik.",
 };
 
 export default function HargaPage() {

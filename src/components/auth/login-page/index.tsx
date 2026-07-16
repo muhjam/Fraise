@@ -9,6 +9,8 @@ import { Form } from "@/components/base/form/form";
 import { Input } from "@/components/base/input/input";
 import { BackgroundPattern } from "@/components/shared-assets/background-patterns";
 import { useAuthStore } from "@/store/use-auth-store";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { APP_NAME } from "@/config";
 
 export const LoginPage = () => {
     const router = useRouter();
@@ -19,7 +21,10 @@ export const LoginPage = () => {
     const [error, setError] = useState<string | null>(null);
 
     const resetSuccess = searchParams.get("reset") === "success";
-    const redirectTo = searchParams.get("redirect") ?? "/";
+    const redirectParam = searchParams.get("redirect");
+    const isVerified = searchParams.get("verified") === "true";
+    const urlError = searchParams.get("error");
+    const isVerificationError = urlError && urlError.toLowerCase().includes("verifi");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -45,7 +50,14 @@ export const LoginPage = () => {
             }
 
             setUser(data.user);
-            router.push(redirectTo);
+
+            // SUPER_ADMIN goes to dashboard; USER falls back to redirect param or home
+            const role = data.user?.role;
+            if (role === "SUPER_ADMIN") {
+                router.push(redirectParam ?? "/dashboard");
+            } else {
+                router.push(redirectParam ?? "/playground");
+            }
         } catch {
             setError("Terjadi kesalahan. Silakan coba lagi.");
         } finally {
@@ -53,141 +65,215 @@ export const LoginPage = () => {
         }
     };
 
-    return (
-        <section className="min-h-screen bg-primary lg:pr-[50%]">
-            {/* Left Panel - Form */}
-            <div className="flex min-h-screen flex-col bg-primary">
-                <div className="flex flex-1 justify-center px-4 py-12 md:items-center md:px-8">
-                    <div className="flex w-full flex-col gap-8 sm:max-w-90">
-                        {/* Logo + Title */}
-                        <div className="flex flex-col items-center gap-6 text-center">
-                            <div className="relative">
-                                <BackgroundPattern
-                                    pattern="grid"
-                                    className="absolute top-1/2 left-1/2 z-0 hidden -translate-x-1/2 -translate-y-1/2 md:block"
-                                />
-                                <BackgroundPattern
-                                    pattern="grid"
-                                    size="md"
-                                    className="absolute top-1/2 left-1/2 z-0 -translate-x-1/2 -translate-y-1/2 md:hidden"
-                                />
-                                <Image
-                                    src="/logo.png"
-                                    alt="Fraise Logo"
-                                    width={48}
-                                    height={48}
-                                    className="relative z-10 object-contain"
-                                />
-                            </div>
-                            <div className="z-10 flex flex-col gap-2 md:gap-3">
-                                <h1 className="text-display-xs font-semibold text-primary md:text-display-sm">
-                                    Selamat datang kembali
-                                </h1>
-                                <p className="text-md text-tertiary">
-                                    Masuk ke akun Fraise Anda untuk melanjutkan.
-                                </p>
-                            </div>
+    // ── Validation Success Screen ─────────────────────────────────────────────
+    if (isVerified) {
+        return (
+            <AuthLayout>
+                <div className="flex flex-col items-center gap-6 text-center">
+                    <div className="relative flex items-center justify-center">
+                        <BackgroundPattern
+                            pattern="grid"
+                            className="absolute z-0 hidden md:block"
+                            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                        <BackgroundPattern
+                            pattern="grid"
+                            size="md"
+                            className="absolute z-0 md:hidden"
+                            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                        <div className="relative z-10 flex size-16 items-center justify-center rounded-full bg-success-50 dark:bg-success-900/30">
+                            <svg className="size-8 text-success-600" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
                         </div>
-
-                        {/* Success message after password reset */}
-                        {resetSuccess && (
-                            <div className="z-10 rounded-xl border border-success-200 bg-success-50 p-4 dark:border-success-800 dark:bg-success-900/20">
-                                <p className="text-sm font-medium text-success-700 dark:text-success-400">
-                                    ✅ Password berhasil diubah. Silakan login dengan password baru Anda.
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Login Form */}
-                        <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                            <div className="flex flex-col gap-5">
-                                <Input
-                                    isRequired
-                                    hideRequiredIndicator
-                                    label="Email"
-                                    type="email"
-                                    name="email"
-                                    placeholder="Masukkan email"
-                                    size="md"
-                                />
-                                <Input
-                                    isRequired
-                                    hideRequiredIndicator
-                                    label="Password"
-                                    type="password"
-                                    name="password"
-                                    size="md"
-                                    placeholder="••••••••"
-                                />
-                                <div className="flex justify-end">
-                                    <Link
-                                        href="/forgot-password"
-                                        className="text-sm font-semibold text-brand-700 hover:text-brand-800"
-                                    >
-                                        Lupa password?
-                                    </Link>
-                                </div>
-                            </div>
-
-                            {error && (
-                                <p className="text-sm font-medium text-red-600">{error}</p>
-                            )}
-
-                            <Button
-                                type="submit"
-                                size="lg"
-                                isLoading={isLoading}
-                                disabled={isLoading}
-                            >
-                                Masuk
-                            </Button>
-                        </Form>
-
-                        <div className="relative z-10 flex justify-center gap-1 text-center">
-                            <span className="text-sm text-tertiary">Belum punya akun?</span>
-                            <Link
-                                href="/register"
-                                className="text-sm font-semibold text-brand-700 hover:text-brand-800"
-                            >
-                                Daftar sekarang
-                            </Link>
-                        </div>
+                    </div>
+                    <div className="z-10 flex flex-col gap-2">
+                        <h1 className="text-display-xs font-semibold text-primary">
+                            Akun berhasil di Aktivasi
+                        </h1>
+                        <p className="text-md text-tertiary">
+                            Selamat! Akun Anda kini sudah aktif dan siap digunakan. Silakan masuk untuk mengakses dasbor Anda.
+                        </p>
                     </div>
                 </div>
 
-                <footer className="hidden p-8 pt-11 lg:block">
-                    <p className="text-sm text-tertiary">© Fraise {new Date().getFullYear()}</p>
-                </footer>
-            </div>
+                <div className="z-10 flex flex-col gap-3 mt-4">
+                    <Button
+                        size="lg"
+                        onClick={() => router.replace("/login")}
+                    >
+                        Masuk ke Akun Lain
+                    </Button>
+                </div>
+            </AuthLayout>
+        );
+    }
 
-            {/* Right Panel - Decorative (Fixed) */}
-            <div className="fixed top-0 right-0 hidden h-screen w-1/2 lg:block">
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-12 text-center">
+    // ── Validation Error Screen ───────────────────────────────────────────────
+    if (isVerificationError) {
+        return (
+            <AuthLayout>
+                <div className="flex flex-col items-center gap-6 text-center">
+                    <div className="relative flex items-center justify-center">
+                        <BackgroundPattern
+                            pattern="grid"
+                            className="absolute z-0 hidden md:block"
+                            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                        <BackgroundPattern
+                            pattern="grid"
+                            size="md"
+                            className="absolute z-0 md:hidden"
+                            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                        <div className="relative z-10 flex size-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/30">
+                            <svg className="size-8 text-red-600" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div className="z-10 flex flex-col gap-2">
+                        <h1 className="text-display-xs font-semibold text-primary">
+                            Aktivasi Gagal
+                        </h1>
+                        <p className="text-md text-tertiary">
+                            Tautan tidak valid atau sudah kedaluwarsa. Silakan daftar ulang atau minta tautan baru.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="z-10 flex flex-col gap-3 mt-4">
+                    <Button
+                        size="lg"
+                        onClick={() => router.push("/register")}
+                    >
+                        Lanjut Registrasi
+                    </Button>
+                    <Button
+                        size="lg"
+                        color="secondary"
+                        onClick={() => router.replace("/login")}
+                    >
+                        Masuk ke Akun Lain
+                    </Button>
+                </div>
+            </AuthLayout>
+        );
+    }
+
+    // ── Login Form ────────────────────────────────────────────────────────────
+    return (
+        <AuthLayout
+            rightPanelContent={
+                <div className="flex flex-col gap-3">
+                    <h2 className="text-2xl font-bold text-white">
+                        Buat soal latihan dalam hitungan detik.
+                    </h2>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                        Soal dipersonalisasi menggunakan AI, selalu unik setiap sesi.
+                    </p>
+                    <div className="flex flex-col gap-1.5 mt-1">
+                        <span className="text-sm text-white/60">✓ 14+ bahasa tersedia</span>
+                        <span className="text-sm text-white/60">✓ Soal selalu unik</span>
+                        <span className="text-sm text-white/60">✓ Reading, Writing, Speaking, Listening</span>
+                    </div>
+                </div>
+            }
+        >
+            {/* Logo + Title */}
+            <div className="flex flex-col items-center gap-6 text-center">
+                <div className="relative">
+                    <BackgroundPattern
+                        pattern="grid"
+                        className="absolute top-1/2 left-1/2 z-0 hidden -translate-x-1/2 -translate-y-1/2 md:block"
+                    />
+                    <BackgroundPattern
+                        pattern="grid"
+                        size="md"
+                        className="absolute top-1/2 left-1/2 z-0 -translate-x-1/2 -translate-y-1/2 md:hidden"
+                    />
                     <Image
                         src="/logo.png"
-                        alt="Fraise Logo"
-                        width={80}
-                        height={80}
-                        className="object-contain drop-shadow-2xl"
+                        alt={`${APP_NAME} Logo`}
+                        width={48}
+                        height={48}
+                        className="relative z-10 object-contain"
                     />
-                    <Image
-                        src="/title-light.png"
-                        alt="Fraise"
-                        width={160}
-                        height={60}
-                        className="object-contain drop-shadow-xl"
-                    />
-                    <p className="max-w-sm text-lg font-medium text-white/80">
-                        Buat soal latihan bahasa yang dipersonalisasi dalam hitungan detik menggunakan kecerdasan buatan.
+                </div>
+                <div className="z-10 flex flex-col gap-2 md:gap-3">
+                    <h1 className="text-display-xs font-semibold text-primary md:text-display-sm">
+                        Selamat datang kembali
+                    </h1>
+                    <p className="text-md text-tertiary">
+                        Masuk ke akun {APP_NAME} Anda untuk melanjutkan.
                     </p>
-                    <div className="flex flex-col gap-2 text-sm text-white/60">
-                        <span>✓ 14+ bahasa tersedia</span>
-                        <span>✓ Soal selalu unik</span>
-                        <span>✓ Reading, Writing, Speaking, Listening</span>
-                    </div>
                 </div>
             </div>
-        </section>
+
+            {/* Success message after password reset */}
+            {resetSuccess && (
+                <div className="z-10 rounded-xl border border-success-200 bg-success-50 p-4 dark:border-success-800 dark:bg-success-900/20">
+                    <p className="text-sm font-medium text-success-700 dark:text-success-400">
+                        ✅ Password berhasil diubah. Silakan login dengan password baru Anda.
+                    </p>
+                </div>
+            )}
+
+            {/* Login Form */}
+            <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                <div className="flex flex-col gap-5">
+                    <Input
+                        isRequired
+                        hideRequiredIndicator
+                        label="Email"
+                        type="email"
+                        name="email"
+                        placeholder="Masukkan email"
+                        size="md"
+                    />
+                    <Input
+                        isRequired
+                        hideRequiredIndicator
+                        label="Password"
+                        type="password"
+                        name="password"
+                        size="md"
+                        placeholder="••••••••"
+                    />
+                    <div className="flex justify-end">
+                        <Link
+                            href="/forgot-password"
+                            className="text-sm font-semibold text-brand-700 hover:text-brand-800"
+                        >
+                            Lupa password?
+                        </Link>
+                    </div>
+                </div>
+
+                {error && (
+                    <p className="text-sm font-medium text-red-600">{error}</p>
+                )}
+
+                <Button
+                    type="submit"
+                    size="lg"
+                    isLoading={isLoading}
+                    disabled={isLoading}
+                >
+                    Masuk
+                </Button>
+            </Form>
+
+            <div className="relative z-10 flex justify-center gap-1 text-center">
+                <span className="text-sm text-tertiary">Belum punya akun?</span>
+                <Link
+                    href="/register"
+                    className="text-sm font-semibold text-brand-700 hover:text-brand-800"
+                >
+                    Daftar sekarang
+                </Link>
+            </div>
+        </AuthLayout>
     );
 };

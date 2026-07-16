@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, CheckCircle, ChevronLeft, Flag01, LayoutGrid02, Zap } from "@untitledui/icons";
+import { ArrowLeft, ArrowRight, CheckCircle, ChevronLeft, Flag01, LayoutGrid02, Zap, LogOut01 } from "@untitledui/icons";
 import { Button } from "../../components/base/buttons/button";
 import { Input } from "../../components/base/input/input";
 import { FeaturedIcon } from "../../components/foundations/featured-icon/featured-icon";
@@ -18,6 +18,9 @@ import { Markdown } from "../../components/shared-assets/markdown";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "../../components/application/modals/modal";
 import { Heading as AriaHeading } from "react-aria-components";
 import { useToast } from "@/contexts/use-toast";
+import { useAuthStore } from "@/store/use-auth-store";
+import { PlaygroundUserDropdown } from "@/components/layout/playground-navbar";
+import Image from "next/image";
 
 export const PlaygroundScreen = () => {
     const router = useRouter();
@@ -27,6 +30,8 @@ export const PlaygroundScreen = () => {
     const { toastError, toastWarning } = useToast();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+    const { isAuthenticated } = useAuthStore();
     const {
         selectExam,
         setQuestions,
@@ -46,11 +51,11 @@ export const PlaygroundScreen = () => {
     const [isRecording, setIsRecording] = useState(false);
     const isGenerating = useRef(false);
 
-    const { 
-        provider, 
-        modelName, 
-        customApiKeys, 
-        usePersonalKey 
+    const {
+        provider,
+        modelName,
+        customApiKeys,
+        usePersonalKey
     } = useConfigStore();
 
     const generateAllQuestions = useCallback(async () => {
@@ -66,7 +71,7 @@ export const PlaygroundScreen = () => {
         const chunks = Math.ceil(total / chunkSize);
 
         let allQuestions: Question[] = [];
-        
+
         try {
             for (let i = 0; i < chunks; i++) {
                 const range = `question number ${i + 1}`;
@@ -76,9 +81,9 @@ export const PlaygroundScreen = () => {
                 const response = await fetch("/api/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        range, 
-                        skill, 
+                    body: JSON.stringify({
+                        range,
+                        skill,
                         language: config.language,
                         provider,
                         model: modelName,
@@ -90,13 +95,13 @@ export const PlaygroundScreen = () => {
 
                 if (!response.ok) {
                     const errorMessage = chunkData.error || "Reached usage limit or API error.";
-                    
+
                     if (allQuestions.length > 0) {
                         toastWarning(
-                            `Generation partially stopped: ${errorMessage}. Using ${allQuestions.length} questions.`, 
+                            `Generation partially stopped: ${errorMessage}. Using ${allQuestions.length} questions.`,
                             "Partial Content Generated"
                         );
-                        break; 
+                        break;
                     } else {
                         throw new Error(errorMessage);
                     }
@@ -117,9 +122,9 @@ export const PlaygroundScreen = () => {
             console.error(err);
             const errorMessage = err.message || "Failed to generate questions. Please try again.";
             setError(errorMessage);
-            
+
             toastError(errorMessage, "Generation Failed");
-            
+
             if (activeExam) {
                 deleteExam(activeExam.id);
             }
@@ -128,7 +133,7 @@ export const PlaygroundScreen = () => {
             isGenerating.current = false;
         }
     }, [activeExam, setStatus, setQuestions, toastError, toastWarning, router, deleteExam, provider, modelName, customApiKeys, usePersonalKey]);
-    
+
     // Sync active exam with URL
     useEffect(() => {
         if (hasHydrated && id && id !== activeExam?.id) {
@@ -211,14 +216,27 @@ export const PlaygroundScreen = () => {
 
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
+    const handleExit = () => {
+        if (isAuthenticated) {
+            router.push("/playground");
+        } else {
+            router.push("/");
+        }
+    };
+
     return (
         <div className="flex min-h-dvh flex-col bg-primary">
             <header className="sticky top-0 z-30 border-b border-secondary bg-primary px-4 py-3 md:px-8">
                 <div className="mx-auto flex w-full max-w-container items-center justify-between">
                     <div className="flex items-center gap-2 md:gap-4">
-                        <Button color="tertiary" size="sm" iconLeading={ChevronLeft} onClick={() => router.push("/")} className="max-md:px-2">
-                            <span className="hidden md:inline">Exit</span>
-                        </Button>
+                        <button
+                            onClick={() => setIsExitModalOpen(true)}
+                            className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-secondary transition-colors"
+                            aria-label="Exit"
+                        >
+                            <Image src="/logo.png" className="object-contain animate-in fade-in zoom-in duration-200" alt="GatrAI Logo" width={28} height={28} />
+                            <span className="hidden md:inline text-sm font-semibold text-secondary">Exit</span>
+                        </button>
                         <hr className="h-4 w-px bg-border-secondary md:h-6" />
                         <span className="text-xs font-semibold text-primary md:text-sm">
                             {currentQuestionIndex + 1}/{questions.length}
@@ -230,8 +248,13 @@ export const PlaygroundScreen = () => {
                         <span className="text-xs font-medium text-tertiary">{Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                         <ThemeToggle />
+                        {isAuthenticated && (
+                            <div className="hidden md:block">
+                                <PlaygroundUserDropdown />
+                            </div>
+                        )}
                         <Button className="md:hidden" color="secondary" size="sm" iconLeading={LayoutGrid02} onClick={() => setIsMobileMenuOpen(true)} />
                     </div>
                 </div>
@@ -315,7 +338,7 @@ export const PlaygroundScreen = () => {
                                             // Split by [blank] OR a sequence of 3 or more underscores
                                             const parts = currentQuestion.description.split(/\[blank\]|_{3,}/g);
                                             if (parts.length === 1) return <Markdown content={currentQuestion.description} />;
-                                            
+
                                             // Handle multiple blanks
                                             const currentAnswers = (() => {
                                                 try {
@@ -450,6 +473,43 @@ export const PlaygroundScreen = () => {
                                     className="flex-1"
                                 >
                                     Yes, Finish
+                                </Button>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Modal>
+            </ModalOverlay>
+
+            <ModalOverlay isDismissable isOpen={isExitModalOpen} onOpenChange={setIsExitModalOpen}>
+                <Modal>
+                    <Dialog>
+                        <div className="relative w-full overflow-hidden rounded-2xl bg-primary shadow-xl sm:max-w-md animate-in fade-in duration-200">
+                            <div className="flex flex-col gap-4 px-4 pt-5 sm:flex-row sm:px-6 sm:pt-6">
+                                <div className="flex-shrink-0">
+                                    <FeaturedIcon icon={LogOut01} color="error" theme="light" size="lg" />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <AriaHeading slot="title" className="text-lg font-semibold text-primary">
+                                        Keluar dari Ujian?
+                                    </AriaHeading>
+                                    <p className="text-sm text-tertiary">
+                                        Apakah kamu yakin ingin keluar? Ujian ini akan otomatis disimpan dan kamu dapat melanjutkannya nanti di Playground.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col-reverse gap-3 p-4 pt-6 sm:flex-row sm:px-6 sm:pb-6">
+                                <Button color="secondary" size="lg" onClick={() => setIsExitModalOpen(false)} className="flex-1">
+                                    Batal
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    onClick={() => {
+                                        setIsExitModalOpen(false);
+                                        handleExit();
+                                    }}
+                                    className="flex-1 bg-error-600 border-error-600 hover:bg-error-700 text-white font-semibold transition-colors justify-center"
+                                >
+                                    Ya, Keluar
                                 </Button>
                             </div>
                         </div>

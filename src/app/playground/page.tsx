@@ -1,5 +1,5 @@
-import { PlaygroundScreen } from "./playground-screen";
+import { PlaygroundHome } from "./playground-home";
 
 export default function PlaygroundPage() {
-    return <PlaygroundScreen />;
+    return <PlaygroundHome />;
 }

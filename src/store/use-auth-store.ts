@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type UserRole = "OWNER" | "TEACHER" | "STUDENT";
+export type UserRole = "USER" | "SUPER_ADMIN";
 
 export interface AuthUser {
     id: string;
     email: string;
+    name: string;
     role: UserRole;
-    bimbelId: string | null;
 }
 
 interface AuthState {

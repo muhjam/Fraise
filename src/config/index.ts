@@ -1,3 +1,7 @@
+// App-level config
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "GatrAI";
+export const APP_LOGO = "/logo.png";
+
 // Server-side only (used in API routes)
 // Priority: Non-public (server-side runtime) > Public (client-side build-time)
 export const AI_PROVIDER = process.env.AI_PROVIDER || process.env.NEXT_PUBLIC_AI_PROVIDER;

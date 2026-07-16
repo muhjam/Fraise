@@ -1,49 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/api/auth/verify-token";
+import { jwtVerify } from "jose";
 
-const ADMIN_ROLES = ["OWNER", "TEACHER"];
-const STUDENT_ROLE = "STUDENT";
+const JWT_SECRET = process.env.JWT_SECRET ?? "fraise-secret-key-change-in-production";
 
-const protectedRoutes: Record<string, string[]> = {
-    "/dashboard": ADMIN_ROLES,
-    "/moduls": [STUDENT_ROLE, ...ADMIN_ROLES], // both can view moduls
-};
+const PROTECTED_PREFIXES = ["/dashboard", "/playground"];
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // Find if this route needs protection
-    const matchedRoute = Object.keys(protectedRoutes).find((route) =>
-        pathname.startsWith(route)
-    );
+    const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
-    if (!matchedRoute) return NextResponse.next();
+    if (isProtected) {
+        // Accept both old and new cookie name for backward compatibility
+        const token =
+            req.cookies.get("token")?.value ??
+            req.cookies.get("fraise_token")?.value;
 
-    const token = req.cookies.get("fraise_token")?.value;
-
-    // Not logged in → redirect to login
-    if (!token) {
-        return NextResponse.redirect(new URL("/login", req.url));
-    }
-
-    const user = verifyToken(token);
-    if (!user) {
-        return NextResponse.redirect(new URL("/login", req.url));
-    }
-
-    const allowedRoles = protectedRoutes[matchedRoute];
-
-    // Role not allowed for this route
-    if (!allowedRoles.includes(user.role)) {
-        if (user.role === STUDENT_ROLE) {
-            return NextResponse.redirect(new URL("/moduls", req.url));
+        if (!token) {
+            const redirectUrl = new URL("/login", req.url);
+            redirectUrl.searchParams.set("redirect", pathname);
+            return NextResponse.redirect(redirectUrl);
         }
-        return NextResponse.redirect(new URL("/dashboard/home", req.url));
+
+        try {
+            const secret = new TextEncoder().encode(JWT_SECRET);
+            await jwtVerify(token, secret);
+        } catch (err: any) {
+            console.error("Middleware JWT Verify failed. Reason:", err.message);
+            const redirectUrl = new URL("/login", req.url);
+            redirectUrl.searchParams.set("redirect", pathname);
+            redirectUrl.searchParams.set("error", err.message);
+            return NextResponse.redirect(redirectUrl);
+        }
     }
 
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/moduls/:path*"],
+    matcher: ["/dashboard", "/dashboard/:path*", "/playground", "/playground/:path*"],
 };
+

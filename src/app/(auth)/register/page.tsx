@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { RegisterPage } from "@/components/auth/register-page";
 
 export const metadata: Metadata = {
-    title: "Daftar – Fraise",
-    description: "Buat akun Fraise dan mulai perjalanan belajar bahasa Anda.",
+    title: "Daftar – GatrAI",
+    description: "Buat akun GatrAI dan mulai perjalanan belajar bahasa Anda.",
 };
 
 export default function RegisterRoute() {

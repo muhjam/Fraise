@@ -51,9 +51,9 @@ export const Footer = () => {
                     {/* Brand */}
                     <div className="flex max-w-xs flex-col gap-4">
                         <div className="flex items-center gap-2">
-                            <Image src="/logo.png" alt="Fraise" width={36} height={36} className="object-contain" />
-                            <Image src="/title-dark.png" alt="Fraise" width={70} height={28} className="object-contain dark:hidden" />
-                            <Image src="/title-light.png" alt="Fraise" width={70} height={28} className="object-contain hidden dark:block" />
+                            <Image src="/logo.png" alt="GatrAI" width={36} height={36} className="object-contain" />
+                            <Image src="/title-dark.png" alt="GatrAI" width={70} height={28} className="object-contain dark:hidden" />
+                            <Image src="/title-light.png" alt="GatrAI" width={70} height={28} className="object-contain hidden dark:block" />
                         </div>
                         <p className="text-sm text-tertiary leading-relaxed">
                             Platform pembuatan soal bahasa bertenaga AI. Buat soal unik dalam hitungan detik untuk 14+ bahasa.
@@ -113,7 +113,7 @@ export const Footer = () => {
                 {/* Bottom row */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm text-tertiary">
-                        © {year} Fraise oleh{" "}
+                        © {year} GatrAI oleh{" "}
                         <a
                             href="https://www.instagram.com/kodingkeliling/"
                             target="_blank"

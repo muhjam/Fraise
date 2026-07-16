@@ -3,8 +3,8 @@ import { PageLayout } from "@/components/layout/page-layout";
 import { FaqSection } from "@/components/marketing/faq-section";
 
 export const metadata: Metadata = {
-    title: "Pertanyaan Umum — Fraise",
-    description: "Temukan jawaban atas pertanyaan yang sering diajukan seputar Fraise — platform pembuatan soal bahasa bertenaga AI.",
+    title: "Pertanyaan Umum — GatrAI",
+    description: "Temukan jawaban atas pertanyaan yang sering diajukan seputar GatrAI — platform pembuatan soal bahasa bertenaga AI.",
 };
 
 export default function PertanyaanPage() {

@@ -14,25 +14,21 @@ export type RegisterPayload = {
     name: string;
     email: string;
     password: string;
-    role: "OWNER" | "TEACHER" | "STUDENT";
-    bimbelName?: string; // required for OWNER
-    bimbelId?: string;   // required for TEACHER / STUDENT
 };
 
 export type AuthUser = {
     id: string;
     email: string;
     name: string;
-    role: "OWNER" | "TEACHER" | "STUDENT";
-    bimbelId: string | null;
+    role: "USER" | "SUPER_ADMIN";
 };
 
 export async function loginUser(payload: LoginPayload): Promise<{ token: string; user: AuthUser }> {
-    const user = await prisma.user.findUnique({
-        where: { email: payload.email },
-    });
+    const user = await prisma.user.findUnique({ where: { email: payload.email } });
 
     if (!user) throw new Error("Invalid email or password");
+
+    if (!user.isVerified) throw new Error("Please activate your account first");
 
     const isPasswordValid = await bcrypt.compare(payload.password, user.passwordHash);
     if (!isPasswordValid) throw new Error("Invalid email or password");
@@ -42,39 +38,28 @@ export async function loginUser(payload: LoginPayload): Promise<{ token: string;
         email: user.email,
         name: user.name,
         role: user.role,
-        bimbelId: user.bimbelId,
     };
 
     const token = jwt.sign(authUser, JWT_SECRET, { expiresIn: "7d" });
     return { token, user: authUser };
 }
 
-export async function registerUser(payload: RegisterPayload): Promise<{ token: string; user: AuthUser }> {
+export async function registerUser(payload: RegisterPayload): Promise<{ user: AuthUser; activationToken: string }> {
     const existing = await prisma.user.findUnique({ where: { email: payload.email } });
     if (existing) throw new Error("Email already registered");
 
     const passwordHash = await bcrypt.hash(payload.password, 10);
-
-    let bimbelId: string | null = null;
-
-    if (payload.role === "OWNER") {
-        if (!payload.bimbelName) throw new Error("Bimbel name is required for Owner");
-        const bimbel = await prisma.bimbel.create({ data: { name: payload.bimbelName } });
-        bimbelId = bimbel.id;
-    } else {
-        if (!payload.bimbelId) throw new Error("Bimbel ID is required for Teacher/Student");
-        const bimbel = await prisma.bimbel.findUnique({ where: { id: payload.bimbelId } });
-        if (!bimbel) throw new Error("Bimbel not found");
-        bimbelId = payload.bimbelId;
-    }
+    const activationToken = crypto.randomBytes(32).toString("hex");
+    const activationTokenHash = crypto.createHash("sha256").update(activationToken).digest("hex");
 
     const user = await prisma.user.create({
         data: {
             name: payload.name,
             email: payload.email,
             passwordHash,
-            role: payload.role,
-            bimbelId,
+            role: "USER",
+            isVerified: false,
+            activationTokenHash,
         },
     });
 
@@ -83,16 +68,13 @@ export async function registerUser(payload: RegisterPayload): Promise<{ token: s
         email: user.email,
         name: user.name,
         role: user.role,
-        bimbelId: user.bimbelId,
     };
 
-    const token = jwt.sign(authUser, JWT_SECRET, { expiresIn: "7d" });
-    return { token, user: authUser };
+    return { user: authUser, activationToken };
 }
 
 export async function requestPasswordReset(email: string): Promise<{ resetToken: string }> {
     const user = await prisma.user.findUnique({ where: { email } });
-    // Don't reveal whether email exists
     if (!user) return { resetToken: "" };
 
     const resetToken = crypto.randomBytes(32).toString("hex");
