@@ -3,6 +3,15 @@
 import { PricingTierCardBanner } from "./base-components/pricing-tier-card";
 import { PLANS, PricingPlan, formatPrice, formatPriceWithDiscount, getProvidersDisplay } from "@/data/plans";
 
+const WA_NUMBER = "6281257578571";
+
+const getWaLink = (planName: string, price: string) => {
+    const text = encodeURIComponent(
+        `Halo Admin Koding Keliling!\n\nSaya ingin memesan paket GatrAI - *${planName}* (${price}).\n\nMohon informasi lebih lanjut mengenai cara pembayaran dan aktivasi akun.\n\nTerima kasih!`
+    );
+    return `https://wa.me/${WA_NUMBER}?text=${text}`;
+};
+
 const getPlanFeatures = (plan: PricingPlan): string[] => {
   const baseFeatures = [
     `${plan.questionLimit === 200 || plan.questionLimit === 1000 ? 'Bisa membuat' : 'Hanya bisa membuat'} ${plan.questionLimit === 200 || plan.questionLimit === 1000 ? `${plan.questionLimit}+` : plan.questionLimit} soal`,
@@ -77,6 +86,7 @@ export const PricingPlansSection = () => {
                   originalPrice={priceInfo?.original}
                   description={plan.description}
                   features={getPlanFeatures(plan)}
+                  waLink={getWaLink(plan.name, priceInfo.current)}
                   // secondAction="Pelajari lebih lanjut"
                   className="h-full"
                 />

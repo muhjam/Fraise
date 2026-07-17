@@ -358,6 +358,8 @@ export const PricingTierCardBanner = (props: {
     className?: string;
     secondAction?: string;
     originalPrice?: string;
+    /** Link WhatsApp lengkap (dengan template pesan). Jika diisi, tombol utama akan mengarah ke WA. */
+    waLink?: string;
 }) => {
     return (
         <div className={cx("flex flex-col overflow-hidden rounded-2xl bg-primary shadow-lg ring-1 ring-secondary_alt", props.className)}>
@@ -383,7 +385,18 @@ export const PricingTierCardBanner = (props: {
                 </div>
 
                   <div className="mt-auto flex flex-col gap-3 px-6 py-8 md:px-8">
-                    <Button size="xl">Get started</Button>
+                    {props.waLink ? (
+                        <Button
+                            size="xl"
+                            href={props.waLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Pesan via WhatsApp
+                        </Button>
+                    ) : (
+                        <Button size="xl">Get started</Button>
+                    )}
                     {props.secondAction && (
                         <Button color="secondary" size="xl">
                             {props.secondAction}

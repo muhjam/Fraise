@@ -226,7 +226,7 @@ export const ConfigForm = () => {
     // Build the hint text for question count input
     const questionCountHint = (() => {
         if (!trialChecked) return "Maks. 10 soal selama versi Beta.";
-        if (remaining <= 0) return "Kuota gratis habis — login untuk lanjut.";
+        if (remaining <= 0) return "Kuota gratis habis.";
         const tokenEst = questionCount > 0 ? `Perkiraan: ${questionCount} token digunakan.` : "";
         return `Sisa kuota gratis: ${remaining} soal. ${tokenEst}`.trim();
     })();
