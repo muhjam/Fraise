@@ -1,7 +1,7 @@
 "use client";
 
 import { PricingTierCardBanner } from "./base-components/pricing-tier-card";
-import { PLANS, PricingPlan, formatPrice, formatPriceWithDiscount, getProvidersDisplay } from "@/data/plans";
+import { PLANS, formatPrice, formatPriceWithDiscount } from "@/data/plans";
 
 const WA_NUMBER = "6281257578571";
 
@@ -10,55 +10,6 @@ const getWaLink = (planName: string, price: string) => {
         `Halo Admin Koding Keliling!\n\nSaya ingin memesan paket GatrAI - *${planName}* (${price}).\n\nMohon informasi lebih lanjut mengenai cara pembayaran dan aktivasi akun.\n\nTerima kasih!`
     );
     return `https://wa.me/${WA_NUMBER}?text=${text}`;
-};
-
-const getPlanFeatures = (plan: PricingPlan): string[] => {
-  const baseFeatures = [
-    `${plan.questionLimit === 200 || plan.questionLimit === 1000 ? 'Bisa membuat' : 'Hanya bisa membuat'} ${plan.questionLimit === 200 || plan.questionLimit === 1000 ? `${plan.questionLimit}+` : plan.questionLimit} soal`,
-    `Provider Tersedia: ${getProvidersDisplay(plan.providers)}`
-  ];
-
-  if (plan.id === 'free-trial') {
-    return [
-      ...baseFeatures,
-      'Dasar-dasar tes bahasa',
-      'Akses fitur dasar',
-      'Support terbatas'
-    ];
-  }
-
-  if (plan.id === 'premium') {
-    return [
-      ...baseFeatures,
-      'Akses semua skill tes',
-      'Priority support',
-      'Export hasil tes'
-    ];
-  }
-
-  if (plan.id === 'eksklusif') {
-    return [
-      ...baseFeatures,
-      'Semua fitur Premium',
-      'Custom API key support',
-      'Analytics lanjutan',
-      'Priority email support'
-    ];
-  }
-
-  if (plan.id === 'luxury') {
-    return [
-      ...baseFeatures,
-      'Semua provider AI terbaik',
-      'Custom API key support',
-      'Analytics lengkap & reporting',
-      'Dedicated account manager',
-      '24/7 priority support',
-      'Custom integration support'
-    ];
-  }
-
-  return baseFeatures;
 };
 
 export const PricingPlansSection = () => {
@@ -85,7 +36,7 @@ export const PricingPlansSection = () => {
                   subtitle={priceInfo.current}
                   originalPrice={priceInfo?.original}
                   description={plan.description}
-                  features={getPlanFeatures(plan)}
+                  features={plan.features}
                   waLink={getWaLink(plan.name, priceInfo.current)}
                   // secondAction="Pelajari lebih lanjut"
                   className="h-full"

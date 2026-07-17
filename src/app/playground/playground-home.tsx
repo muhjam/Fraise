@@ -48,7 +48,7 @@ export const PlaygroundHome = () => {
                     {/* RIGHT — form generator (order-first on mobile) */}
                     <aside className="order-first md:order-last w-full md:w-[420px] lg:w-[460px] shrink-0 flex flex-col gap-4 md:sticky md:top-6">
                         <TokenStatusCard />
-                        <ConfigForm />
+                        <ConfigForm isPlayground />
                     </aside>
 
                     {/* LEFT — exam list */}

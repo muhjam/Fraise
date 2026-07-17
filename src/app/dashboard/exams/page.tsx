@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BookClosed } from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
 import { DataTable } from "@/components/shared/data-table";
 import { ExamFormModal } from "@/components/dashboard/exam-form-modal";
 import { useDashboardStore, type DashboardExam } from "@/store/use-dashboard-store";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 
 const STATUS_LABEL: Record<DashboardExam["status"], string> = {
     draft: "Draft",
@@ -98,12 +100,11 @@ export default function ExamsPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
-                <h1 className="text-display-xs font-semibold text-primary">Ujian</h1>
-                <p className="text-sm text-tertiary">
-                    Kelola ujian, tambah soal, dan undang peserta.
-                </p>
-            </div>
+            <DashboardPageHeader
+                icon={BookClosed}
+                title="Ujian"
+                description="Kelola ujian, tambah soal, dan undang peserta."
+            />
 
             <DataTable
                 title="Daftar Ujian"

@@ -42,7 +42,7 @@ export const PLANS: PricingPlan[] = [
     providers: ['auto', 'groq', 'deepseek', 'gemini'],
     features: [
       'Hanya bisa membuat 50 soal',
-      'Provider Tersedia: Auto, Groq, Deepseek, Gemini',
+      'Provider Tersedia: Hanya Auto (Groq, Deepseek, Gemini)',
       'Akses semua skill tes',
       'Priority support',
       'Export hasil tes'

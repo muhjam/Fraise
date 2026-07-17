@@ -4,8 +4,10 @@ import { useAuthStore } from "@/store/use-auth-store";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
 import { FeaturedCardProgressBar } from "@/components/application/app-navigation/base-components/featured-cards";
+import { Settings01 } from "@untitledui/icons";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 
 export default function SettingsPage() {
     const router = useRouter();
@@ -20,10 +22,11 @@ export default function SettingsPage() {
 
     return (
         <div className="flex max-w-xl flex-col gap-8">
-            <div>
-                <h1 className="text-display-xs font-semibold text-primary">Pengaturan Profil</h1>
-                <p className="mt-1 text-sm text-tertiary">Kelola informasi akun dan kata sandi Anda di sini.</p>
-            </div>
+            <DashboardPageHeader
+                icon={Settings01}
+                title="Pengaturan Profil"
+                description="Kelola informasi akun dan kata sandi Anda di sini."
+            />
 
             <div className="flex flex-col gap-6 rounded-xl bg-primary p-6 ring-1 ring-secondary ring-inset">
                 <div className="flex flex-col gap-2">

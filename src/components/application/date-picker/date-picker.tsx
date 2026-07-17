@@ -17,9 +17,13 @@ interface DatePickerProps extends AriaDatePickerProps<DateValue> {
     onApply?: () => void;
     /** The function to call when the cancel button is clicked. */
     onCancel?: () => void;
+    /** Whether the trigger button should take full width. */
+    fullWidth?: boolean;
+    /** Placeholder text when no date is selected. */
+    placeholder?: string;
 }
 
-export const DatePicker = ({ value: valueProp, defaultValue, onChange, onApply, onCancel, ...props }: DatePickerProps) => {
+export const DatePicker = ({ value: valueProp, defaultValue, onChange, onApply, onCancel, fullWidth, placeholder = "Pilih tanggal", ...props }: DatePickerProps) => {
     const formatter = useDateFormatter({
         month: "short",
         day: "numeric",
@@ -27,12 +31,12 @@ export const DatePicker = ({ value: valueProp, defaultValue, onChange, onApply, 
     });
     const [value, setValue] = useControlledState(valueProp, defaultValue || null, onChange);
 
-    const formattedDate = value ? formatter.format(value.toDate(getLocalTimeZone())) : "Select date";
+    const formattedDate = value ? formatter.format(value.toDate(getLocalTimeZone())) : placeholder;
 
     return (
-        <AriaDatePicker shouldCloseOnSelect={false} {...props} value={value} onChange={setValue}>
-            <AriaGroup>
-                <Button size="md" color="secondary" iconLeading={CalendarIcon}>
+        <AriaDatePicker shouldCloseOnSelect={false} {...props} value={value} onChange={setValue} className={cx(fullWidth && "w-full flex flex-col", typeof props.className === "string" && props.className)}>
+            <AriaGroup className={cx("flex", fullWidth && "w-full")}>
+                <Button size="md" color="secondary" iconLeading={CalendarIcon} className={cx(fullWidth && "flex-1 justify-start")}>
                     {formattedDate}
                 </Button>
             </AriaGroup>

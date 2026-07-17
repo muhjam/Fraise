@@ -1,7 +1,7 @@
 "use client";
 
-import { type ComponentType, type HTMLAttributes, type ReactNode, type Ref, createContext, useContext } from "react";
-import { HelpCircle, InfoCircle } from "@untitledui/icons";
+import { type ComponentType, type HTMLAttributes, type ReactNode, type Ref, createContext, useContext, useState } from "react";
+import { HelpCircle, InfoCircle, Eye, EyeOff } from "@untitledui/icons";
 import type { InputProps as AriaInputProps, TextFieldProps as AriaTextFieldProps } from "react-aria-components";
 import { Group as AriaGroup, Input as AriaInput, TextField as AriaTextField } from "react-aria-components";
 import { HintText } from "@/components/base/input/hint-text";
@@ -33,6 +33,8 @@ export interface InputBaseProps extends TextFieldProps {
     groupRef?: Ref<HTMLDivElement>;
     /** Icon component to display on the left side of the input. */
     icon?: ComponentType<HTMLAttributes<HTMLOrSVGElement>>;
+    /** When true, renders a show/hide toggle button for password fields. */
+    isPassword?: boolean;
 }
 
 export const InputBase = ({
@@ -49,12 +51,20 @@ export const InputBase = ({
     tooltipClassName,
     inputClassName,
     iconClassName,
+    isPassword,
     // Omit this prop to avoid invalid HTML attribute warning
     isRequired: _isRequired,
     ...inputProps
 }: Omit<InputBaseProps, "label" | "hint">) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    // If isPassword is true, override type based on visibility state
+    const resolvedType = isPassword
+        ? (showPassword ? "text" : "password")
+        : (inputProps as AriaInputProps).type;
+
     // Check if the input has a leading icon or tooltip
-    const hasTrailingIcon = tooltip || isInvalid;
+    const hasTrailingIcon = tooltip || isInvalid || isPassword;
     const hasLeadingIcon = Icon;
 
     // If the input is inside a `TextFieldContext`, use its context to simplify applying styles
@@ -122,10 +132,12 @@ export const InputBase = ({
                 {...(inputProps as AriaInputProps)}
                 ref={ref}
                 placeholder={placeholder}
+                type={resolvedType}
                 className={cx(
                     "m-0 w-full bg-transparent text-md text-primary ring-0 outline-hidden placeholder:text-placeholder autofill:rounded-lg autofill:text-primary",
                     isDisabled && "cursor-not-allowed text-disabled",
                     sizes[inputSize].root,
+                    isPassword && "pr-10",
                     context?.inputClassName,
                     inputClassName,
                 )}
@@ -157,6 +169,24 @@ export const InputBase = ({
                         tooltipClassName,
                     )}
                 />
+            )}
+
+            {/* Password show/hide toggle */}
+            {isPassword && !isInvalid && (
+                <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                    className={cx(
+                        "absolute cursor-pointer text-fg-quaternary transition duration-200 hover:text-fg-secondary focus:outline-hidden",
+                        sizes[inputSize].iconTrailing,
+                    )}
+                >
+                    {showPassword
+                        ? <EyeOff className="size-4" />
+                        : <Eye className="size-4" />
+                    }
+                </button>
             )}
 
             {/* Shortcut */}
@@ -237,8 +267,12 @@ export const Input = ({
     inputClassName,
     wrapperClassName,
     tooltipClassName,
+    isPassword: isPasswordProp,
     ...props
 }: InputProps) => {
+    // Auto-enable password toggle when type="password"
+    const isPassword = isPasswordProp ?? (props.type === "password");
+
     return (
         <TextField aria-label={!label ? placeholder : undefined} {...props} className={className}>
             {({ isRequired, isInvalid }) => (
@@ -258,6 +292,7 @@ export const Input = ({
                             wrapperClassName,
                             tooltipClassName,
                             tooltip,
+                            isPassword,
                         }}
                     />
 

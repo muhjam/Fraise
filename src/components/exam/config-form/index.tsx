@@ -44,7 +44,7 @@ const StatusDot = ({ color = "success" }: { color?: "success" | "error" | "warni
 );
 
 // Modal for trial limit reached
-const TrialLimitModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const TrialLimitModal = ({ isOpen, onClose, isLoggedIn }: { isOpen: boolean; onClose: () => void; isLoggedIn: boolean }) => {
     const router = useRouter();
     if (!isOpen) return null;
 
@@ -56,28 +56,43 @@ const TrialLimitModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                         <Lock01 className="size-7" />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <h2 className="text-xl font-semibold text-primary">Kuota Gratis Habis</h2>
+                        <h2 className="text-xl font-semibold text-primary">Kuota Habis</h2>
                         <p className="text-sm text-tertiary leading-relaxed">
-                            Kamu sudah menggunakan <strong>{FREE_LIMIT} soal gratis</strong>. Buat akun atau login untuk melanjutkan dan mendapatkan akses lebih banyak soal.
+                            {isLoggedIn
+                                ? <>Kuota soal kamu sudah habis. Upgrade paket untuk mendapatkan akses lebih banyak soal.</>
+                                : <>Kamu sudah menggunakan <strong>{FREE_LIMIT} soal gratis</strong>. Buat akun atau login untuk melanjutkan dan mendapatkan akses lebih banyak soal.</>
+                            }
                         </p>
                     </div>
                     <div className="flex flex-col w-full gap-3">
-                        <Button
-                            size="lg"
-                            iconLeading={LogIn01}
-                            onClick={() => router.push("/login?redirect=/")}
-                            className="w-full"
-                        >
-                            Login Sekarang
-                        </Button>
-                        <Button
-                            size="lg"
-                            color="secondary"
-                            onClick={() => router.push("/register")}
-                            className="w-full"
-                        >
-                            Buat Akun Gratis
-                        </Button>
+                        {isLoggedIn ? (
+                            <Button
+                                size="lg"
+                                onClick={() => router.push("/pricing")}
+                                className="w-full"
+                            >
+                                Langganan Sekarang
+                            </Button>
+                        ) : (
+                            <>
+                                <Button
+                                    size="lg"
+                                    iconLeading={LogIn01}
+                                    onClick={() => router.push("/login?redirect=/")}
+                                    className="w-full"
+                                >
+                                    Login Sekarang
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    color="secondary"
+                                    onClick={() => router.push("/register")}
+                                    className="w-full"
+                                >
+                                    Buat Akun Gratis
+                                </Button>
+                            </>
+                        )}
                         <button
                             onClick={onClose}
                             className="text-sm text-tertiary hover:text-secondary transition-colors"
@@ -91,7 +106,7 @@ const TrialLimitModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
     );
 };
 
-export const ConfigForm = () => {
+export const ConfigForm = ({ isPlayground = false }: { isPlayground?: boolean }) => {
     const router = useRouter();
     const { toastSuccess, toastError, toastWarning } = useToast();
     const createExamAction = useExamStore((state) => state.createNewExam);
@@ -115,9 +130,10 @@ export const ConfigForm = () => {
     const [trialUsed, setTrialUsed] = useState(0);
     const [trialChecked, setTrialChecked] = useState(false);
 
-    // Determine if user is on a free/locked plan (not logged in OR no paid plan)
-    // For now: if not logged in → locked (Auto only, no settings)
-    const isLockedPlan = !user;
+    // Locked = tidak login, ATAU planId bukan 'eksklusif'/'luxury'
+    // null/undefined planId = belum berlangganan (auto-only)
+    const canChooseProvider = !!user && (user.planId === 'eksklusif' || user.planId === 'luxury');
+    const isLockedPlan = !canChooseProvider;
 
     // Initial status checks
     useEffect(() => {
@@ -233,12 +249,14 @@ export const ConfigForm = () => {
 
     return (
         <>
-            <TrialLimitModal isOpen={isTrialLimitOpen} onClose={() => setIsTrialLimitOpen(false)} />
+            <TrialLimitModal isOpen={isTrialLimitOpen} onClose={() => setIsTrialLimitOpen(false)} isLoggedIn={!!user} />
 
             <div className="flex w-full flex-col gap-8 rounded-2xl border border-secondary bg-primary p-6 shadow-sm">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-display-xs font-semibold text-primary">Buat Soal</h2>
+                        <h2 className="text-display-xs font-semibold text-primary">
+                        {isPlayground ? "Buat Soal" : "Coba Buat Soal"}
+                    </h2>
                     </div>
                     <p className="text-sm text-tertiary">
                         Konfigurasi parameter untuk menghasilkan soal bertenaga AI. Gratis untuk 10 soal pertama.
@@ -393,10 +411,13 @@ export const ConfigForm = () => {
                                     </div>
                                 )}
 
-                                {/* Lock notice for free plan */}
+                                {/* Lock notice for free/premium plan */}
                                 {isLockedPlan && (
                                     <p className="text-xs text-tertiary">
-                                        Login dan upgrade paket untuk memilih provider AI secara manual.
+                                        {!user
+                                            ? "Login dan upgrade paket untuk memilih provider AI secara manual."
+                                            : "Upgrade ke paket Eksklusif atau Luxury untuk memilih provider AI secara manual."
+                                        }
                                     </p>
                                 )}
 
@@ -420,14 +441,20 @@ export const ConfigForm = () => {
                                     color="secondary"
                                     size="sm"
                                     iconLeading={Zap}
-                                    onClick={() => isLockedPlan ? router.push("/login") : setIsModalOpen(true)}
+                                    onClick={() => {
+                                        if (!user) return router.push("/login");
+                                        if (isLockedPlan) return router.push("/pricing");
+                                        setIsModalOpen(true);
+                                    }}
                                     disabled={isLockedPlan}
                                 >
-                                    {isLockedPlan
+                                    {!user
                                         ? "Login untuk Gunakan API Key Sendiri"
-                                        : hasActiveCustomKey
-                                            ? `Kelola API Key ${provider.toUpperCase()}`
-                                            : `Gunakan API Key ${provider.toUpperCase()} Sendiri`
+                                        : isLockedPlan
+                                            ? "Upgrade untuk Gunakan API Key Sendiri"
+                                            : hasActiveCustomKey
+                                                ? `Kelola API Key ${provider.toUpperCase()}`
+                                                : `Gunakan API Key ${provider.toUpperCase()} Sendiri`
                                     }
                                 </Button>
                             </div>

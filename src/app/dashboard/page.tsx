@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BookClosed, BookOpen01, CheckCircle, Clock, LayoutAlt01, Zap } from "@untitledui/icons";
+import { BookClosed, BookOpen01, Clock, Zap, Home01 } from "@untitledui/icons";
 import { MetricsIcon03 } from "@/components/application/metrics/metrics";
 import { DataTable } from "@/components/shared/data-table";
 import { Badge } from "@/components/base/badges/badges";
 import { useExamStore, type ExamAttempt } from "@/store/use-exam-store";
 import { useAuthStore } from "@/store/use-auth-store";
 import { Button } from "@/components/base/buttons/button";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 
 const EXAM_COLUMNS = [
     {
@@ -69,15 +70,11 @@ export default function DashboardPage() {
 
     return (
         <div className="flex flex-col gap-8">
-            {/* Page header */}
-            <div className="flex flex-col gap-1">
-                <h1 className="text-display-xs font-semibold text-primary">
-                    Selamat datang, {user?.name?.split(" ")[0] || user?.email?.split("@")[0] || "—"} 👋
-                </h1>
-                <p className="text-sm text-tertiary">
-                    Berikut ringkasan aktivitas ujian Anda.
-                </p>
-            </div>
+            <DashboardPageHeader
+                icon={Home01}
+                title={`Selamat datang, ${user?.name?.split(" ")[0] || user?.email?.split("@")[0] || "—"} 👋`}
+                description="Berikut ringkasan aktivitas ujian Anda."
+            />
 
             {/* Metrics */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

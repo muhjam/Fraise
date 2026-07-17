@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BookOpen01 } from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
 import { DataTable } from "@/components/shared/data-table";
 import { QuestionFormModal } from "@/components/dashboard/question-form-modal";
 import { useDashboardStore, type DashboardQuestion } from "@/store/use-dashboard-store";
+import { DashboardPageHeader } from "@/components/dashboard/page-header";
 
 const COLUMNS = [
     {
@@ -74,12 +76,11 @@ export default function QuestionsPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
-                <h1 className="text-display-xs font-semibold text-primary">Bank Soal</h1>
-                <p className="text-sm text-tertiary">
-                    Kelola semua soal yang tersedia untuk digunakan dalam ujian.
-                </p>
-            </div>
+            <DashboardPageHeader
+                icon={BookOpen01}
+                title="Bank Soal"
+                description="Kelola semua soal yang tersedia untuk digunakan dalam ujian."
+            />
 
             <DataTable
                 title="Daftar Soal"

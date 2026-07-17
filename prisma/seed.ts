@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-    const email = "admin@getrai.id";
+    const email = "admin@gatrai.id";
     const password = "Password123%";
     const passwordHash = await bcrypt.hash(password, 12);
 
@@ -12,21 +12,24 @@ async function main() {
 
     const user = await prisma.user.upsert({
         where: { email },
-        update: {},
+        update: {
+            passwordHash,
+            role: "SUPER_ADMIN",
+            name: "Super Admin",
+            isVerified: true,
+        },
         create: {
             email,
             passwordHash,
             role: "SUPER_ADMIN",
             name: "Super Admin",
+            isVerified: true,
         },
     });
 
-    console.log(`✅ Created user: ${user.email} (role: ${user.role})`);
-    console.log("🗑  Deleting seeded account...");
-
-    await prisma.user.delete({ where: { id: user.id } });
-
-    console.log("✅ Seed account deleted. Database is clean.");
+    console.log(`✅ Super admin ready: ${user.email} (role: ${user.role})`);
+    console.log(`   Email   : ${email}`);
+    console.log(`   Password: ${password}`);
 }
 
 main()

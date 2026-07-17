@@ -39,11 +39,11 @@ export const Footer = () => {
                         <div className="flex flex-col gap-3">
                             <p className="text-sm font-semibold text-secondary">Mulai sekarang, gratis</p>
                             <div className="flex flex-col gap-2 sm:flex-row">
-                                <Button size="md" href="/register">
-                                    Daftar Gratis
-                                </Button>
                                 <Button size="md" color="secondary" href="/login">
                                     Masuk
+                                </Button>
+                                <Button size="md" href="/register">
+                                    Daftar Gratis
                                 </Button>
                             </div>
                         </div>

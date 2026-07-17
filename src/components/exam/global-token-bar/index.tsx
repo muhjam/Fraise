@@ -1,20 +1,27 @@
 "use client";
 
 import { useConfigStore } from "@/store/use-config-store";
+import { useAuthStore } from "@/store/use-auth-store";
 import { ShieldTick, Zap, Globe01, AlertTriangle } from "@untitledui/icons";
 import { cx } from "@/utils/cx";
 
 export const GlobalTokenBar = () => {
-    const { connectionStatuses, provider, customApiKeys, usePersonalKey } = useConfigStore();
+    const { connectionStatuses, provider, customApiKeys, usePersonalKey, isManualSelection } = useConfigStore();
+    const user = useAuthStore((s) => s.user);
 
     const status = connectionStatuses[provider];
     const hasPersonalKey = !!customApiKeys[provider];
     const isUsingPersonal = hasPersonalKey && usePersonalKey;
 
+    // User is in auto-only mode if: not logged in, OR plan is not eksklusif/luxury
+    const isAutoOnly = !user || !(user.planId === "eksklusif" || user.planId === "luxury");
+    // Show AUTO label when: user is auto-only (regardless of isManualSelection), or hasn't made a manual selection
+    const showAsAuto = isAutoOnly || !isManualSelection;
+
     const getStatusConfig = () => {
         if (status === "connected") {
             return {
-                label: isUsingPersonal ? `${provider.toUpperCase()} Personal Active` : `${provider.toUpperCase()} Global Active`,
+                label: isUsingPersonal ? `${provider.toUpperCase()} Personal Active` : showAsAuto ? "AUTO Global Active" : `${provider.toUpperCase()} Global Active`,
                 sub: isUsingPersonal ? "Using your own API key." : "Using system-provided API key.",
                 color: "success",
                 icon: isUsingPersonal ? ShieldTick : Globe01

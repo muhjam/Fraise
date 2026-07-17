@@ -19,6 +19,11 @@ model User {
   email        String  @unique
   passwordHash String
   role         Role    @default(USER)
+  planId       String?
+
+  // Plan subscription dates
+  planStartDate DateTime?
+  planEndDate   DateTime?
 
   // Account verification
   isVerified          Boolean @default(false)
@@ -31,6 +36,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  exams     Exam[]
+
   @@map("users")
 }
 
@@ -42,4 +49,39 @@ model IpTrial {
   createdAt     DateTime @default(now())
 
   @@map("ip_trials")
+}
+
+model Exam {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  language   String
+  skills     String[] // e.g. ["Reading", "Writing"]
+  provider   String   @default("auto")
+  modelName  String?
+
+  status     String   @default("ongoing") // ongoing | completed
+
+  questions  Question[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("exams")
+}
+
+model Question {
+  id       String @id @default(uuid())
+  examId   String
+  exam     Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  content  String // the question text / JSON
+  type     String // reading | writing | speaking | listening
+  answer   String? // user's answer
+  score    Float?  // AI-evaluated score
+
+  createdAt DateTime @default(now())
+
+  @@map("questions")
 }
