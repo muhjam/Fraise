@@ -95,7 +95,9 @@ function DashboardSidebar({ activeUrl }: { activeUrl: string }) {
     const handleLogout = async () => {
         await fetch("/api/auth/logout", { method: "POST" });
         logout();
-        router.push("/login");
+        // Hard navigation — forces browser to send a new request so middleware
+        // picks up the cleared cookie and redirects to /login properly.
+        window.location.href = "/login";
     };
 
     const initials = user?.email

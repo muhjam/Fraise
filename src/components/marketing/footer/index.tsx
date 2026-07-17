@@ -16,6 +16,7 @@ const NAV_LINKS = [
 export const Footer = () => {
     const year = new Date().getFullYear();
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+    const isAuthReady = useAuthStore((s) => s.isAuthReady);
 
     return (
         <footer className="w-full border-t border-secondary bg-primary">
@@ -35,7 +36,7 @@ export const Footer = () => {
                     </div>
 
                     {/* CTA: hanya tampil kalau belum login */}
-                    {!isAuthenticated && (
+                    {isAuthReady && !isAuthenticated && (
                         <div className="flex flex-col gap-3">
                             <p className="text-sm font-semibold text-secondary">Mulai sekarang, gratis</p>
                             <div className="flex flex-col gap-2 sm:flex-row">

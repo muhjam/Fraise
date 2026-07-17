@@ -14,8 +14,12 @@ export interface AuthUser {
 interface AuthState {
     user: AuthUser | null;
     isAuthenticated: boolean;
+    /** True once the initial /api/auth/me check has completed. Use this to
+     *  prevent UI flicker caused by rendering before auth state is confirmed. */
+    isAuthReady: boolean;
     setUser: (user: AuthUser) => void;
     logout: () => void;
+    setAuthReady: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,11 +27,18 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             user: null,
             isAuthenticated: false,
+            isAuthReady: false,
             setUser: (user) => set({ user, isAuthenticated: true }),
             logout: () => set({ user: null, isAuthenticated: false }),
+            setAuthReady: () => set({ isAuthReady: true }),
         }),
         {
             name: "fraise-auth-storage",
+            // Don't persist isAuthReady — it must always start false on mount
+            partialize: (state) => ({
+                user: state.user,
+                isAuthenticated: state.isAuthenticated,
+            }),
         }
     )
 );

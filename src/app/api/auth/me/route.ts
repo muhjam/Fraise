@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/api/auth";
+import { COOKIE_NAME } from "@/lib/auth-cookie";
 
 export async function GET(req: NextRequest) {
-    const token = req.cookies.get("token")?.value ?? req.cookies.get("fraise_token")?.value;
+    const token = req.cookies.get(COOKIE_NAME)?.value;
 
     if (!token) {
         return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -18,7 +19,6 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE() {
     const response = NextResponse.json({ message: "Logged out" }, { status: 200 });
-    response.cookies.set("token", "", { maxAge: 0, path: "/" });
-    response.cookies.set("fraise_token", "", { maxAge: 0, path: "/" });
+    response.cookies.set(COOKIE_NAME, "", { maxAge: 0, path: "/" });
     return response;
 }

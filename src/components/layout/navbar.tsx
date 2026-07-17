@@ -38,8 +38,10 @@ function UserDropdown() {
         setOpen(false);
         await fetch("/api/auth/logout", { method: "POST" });
         logout();
-        router.push("/");
+        window.location.href = "/";
     };
+
+    const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
     const initials = user?.name
         ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
@@ -82,17 +84,19 @@ function UserDropdown() {
 
                     {/* Menu items */}
                     <div className="py-1">
-                        {/* Playground */}
-                        <Link
-                            href="/playground"
-                            onClick={() => setOpen(false)}
-                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-secondary hover:bg-secondary hover:text-primary transition-colors"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polygon points="5,3 19,12 5,21" />
-                            </svg>
-                            Playground
-                        </Link>
+                        {/* Playground — hanya untuk USER biasa */}
+                        {!isSuperAdmin && (
+                            <Link
+                                href="/playground"
+                                onClick={() => setOpen(false)}
+                                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-secondary hover:bg-secondary hover:text-primary transition-colors"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polygon points="5,3 19,12 5,21" />
+                                </svg>
+                                Playground
+                            </Link>
+                        )}
 
                         {/* Dashboard */}
                         <Link
@@ -133,7 +137,7 @@ export const Navbar = () => {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    const { isAuthenticated } = useAuthStore();
+    const { isAuthenticated, isAuthReady } = useAuthStore();
 
     return (
         <header className="relative z-50 w-full animate-[fadeSlideDown_0.6s_ease-out_both]">
@@ -171,7 +175,10 @@ export const Navbar = () => {
                 <div className="flex items-center gap-3">
                     <ThemeToggle />
 
-                    {isAuthenticated ? (
+                    {/* Wait until auth check is done to avoid flash */}
+                    {!isAuthReady ? (
+                        <div className="h-9 w-24 animate-pulse rounded-lg bg-secondary" />
+                    ) : isAuthenticated ? (
                         <UserDropdown />
                     ) : (
                         <>
@@ -227,7 +234,7 @@ export const Navbar = () => {
                             </Link>
                         );
                     })}
-                    {!isAuthenticated && (
+                    {!isAuthReady ? null : !isAuthenticated && (
                         <div className="flex gap-2 pt-2 border-t border-secondary mt-2">
                             <Button size="sm" color="secondary" href="/login" className="flex-1">Masuk</Button>
                             <Button size="sm" href="/register" className="flex-1">Daftar Gratis</Button>

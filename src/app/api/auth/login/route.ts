@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loginUser } from "@/api/auth";
+import { COOKIE_NAME } from "@/lib/auth-cookie";
 
 export async function POST(req: NextRequest) {
     try {
@@ -17,8 +18,7 @@ export async function POST(req: NextRequest) {
 
         const response = NextResponse.json({ user }, { status: 200 });
 
-        // Set JWT as HttpOnly cookie for security
-        response.cookies.set("token", token, {
+        response.cookies.set(COOKIE_NAME, token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",

@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/api/auth";
+import { COOKIE_NAME } from "@/lib/auth-cookie";
 
 function getAdminUser(req: NextRequest) {
-    const token =
-        req.cookies.get("token")?.value ??
-        req.cookies.get("fraise_token")?.value;
+    const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token) return null;
     const user = verifyToken(token);
     if (!user || user.role !== "SUPER_ADMIN") return null;

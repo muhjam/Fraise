@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "@/store/use-auth-store";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const { logout, setUser } = useAuthStore();
-    const [isChecking, setIsChecking] = useState(true);
+    const { logout, setUser, setAuthReady } = useAuthStore();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -15,20 +14,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const data = await res.json();
                     setUser(data.user);
                 } else {
-                    // Cookie invalid/missing, clear local storage state
                     logout();
                 }
-            } catch (error) {
+            } catch {
                 logout();
             } finally {
-                setIsChecking(false);
+                // Mark auth check as done — UI can now render auth-sensitive content
+                setAuthReady();
             }
         };
 
         checkAuth();
-    }, [logout, setUser]);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Opional: If you want to block rendering while checking, you can return a loader
-    // But returning children directly is smoother if you prefer optimistic UI.
     return <>{children}</>;
 }
